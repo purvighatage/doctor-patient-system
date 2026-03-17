@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now()) // <-- add @default(now())
+  doctor    Doctor?
+  patient   Patient?
+}
+
+enum Role {
+  PATIENT
+  DOCTOR
+  ADMIN
+}
+model Doctor {
+  id           Int       @id @default(autoincrement())
+  userId       Int       @unique
+  name         String
+  specialty    String
+  qualifications String?
+  experience   Int?
+  fees         Float?
+  clinic       String?
+  gender       String?
+  active       Boolean   @default(true)
+  user         User      @relation(fields: [userId], references: [id])
+  slots        Slot[]
+  appointments Appointment[]
+}
+
+model Patient {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  name      String
+  email     String
+  phone     String
+  dob       DateTime
+  user      User     @relation(fields: [userId], references: [id])
+  appointments Appointment[]
+}
+
+
+
+model Slot {
+  id           Int        @id @default(autoincrement())
+  doctorId     Int
+  date         DateTime
+  startTime    DateTime
+  endTime      DateTime
+  booked       Boolean    @default(false)
+
+  doctor       Doctor     @relation(fields: [doctorId], references: [id])
+  appointments Appointment[]  // <-- add this
+
+  @@unique([doctorId, date, startTime])
+}
+
+model Appointment {
+  id        Int      @id @default(autoincrement())
+  patientId Int
+  doctorId  Int
+  slotId    Int
+  status    Status   @default(PENDING)
+  createdAt DateTime @default(now())
+
+  patient   Patient  @relation(fields: [patientId], references: [id])
+  doctor    Doctor   @relation(fields: [doctorId], references: [id])
+  slot      Slot     @relation(fields: [slotId], references: [id])
+}
+
+enum Status {
+  PENDING
+  BOOKED
+  CANCELLED
+  COMPLETED
+}
+
+
+
