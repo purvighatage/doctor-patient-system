@@ -1,20 +1,25 @@
-// in app.js or modules/patient/patient.routes.js
-const db = require("./config/db");
+const express = require("express");
+const { authenticate, authorize } = require("../../middleware/auth.middleware");
+const {
+  getProfile,
+  getDoctors,
+  getDoctorById,
+  bookAppointment,
+  cancelAppointment,
+  getHistory
+} = require("./patient.controller");
 
-app.post("/api/patient", authenticate, authorize("PATIENT"), (req, res) => {
-  const { name, email } = req.body;
+const router = express.Router();
 
-  if (!name || !email) {
-    return res.status(400).json({ message: "Name and email are required" });
-  }
+// Apply auth middleware to all patient routes
+router.use(authenticate);
+router.use(authorize("PATIENT"));
 
-  const sql = "INSERT INTO patients (name, email) VALUES (?, ?)";
-  db.query(sql, [name, email], (err, result) => {
-    if (err) {
-      console.error("DB Error:", err);
-      return res.status(500).json({ message: "Database error" });
-    }
+router.get("/profile", getProfile);
+router.get("/doctors", getDoctors);
+router.get("/doctors/:id", getDoctorById);
+router.post("/appointments", bookAppointment);
+router.put("/appointments/:id/cancel", cancelAppointment);
+router.get("/appointments", getHistory);
 
-    res.json({ message: "Patient added", patientId: result.insertId });
-  });
-});
+module.exports = router;

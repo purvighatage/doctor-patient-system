@@ -1,0 +1,233 @@
+{
+  "info": {
+    "name": "Doctor-Patient System API",
+    "description": "Endpoints for the Doctor-Patient Management System.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register Patient",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"phone\": \"9876543210\",\n  \"dob\": \"1990-01-01\",\n  \"password\": \"securepassword\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/auth/register",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login (Generic)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@system.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/auth/login",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admins",
+      "item": [
+        {
+          "name": "Create a Doctor",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "<REPLACE_WITH_ADMIN_TOKEN>", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Dr. Strange\",\n  \"email\": \"dr.strange@hospital.com\",\n  \"specialty\": \"Neurology\",\n  \"qualifications\": \"MD, Neurology\",\n  \"experience\": 15,\n  \"fees\": 1000,\n  \"clinic\": \"Sanctum Clinic\",\n  \"gender\": \"Male\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/admins/doctors",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "admins", "doctors"]
+            }
+          }
+        },
+        {
+          "name": "Get Analytics",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "<REPLACE_WITH_ADMIN_TOKEN>", "type": "string" }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/admins/analytics",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "admins", "analytics"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Doctors",
+      "item": [
+        {
+          "name": "Update Temp Password",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "<REPLACE_WITH_DOCTOR_TOKEN_FROM_LOGIN>", "type": "string" }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"oldPassword\": \"<TEMP_PASSWORD>\",\n  \"newPassword\": \"newsecurepassword123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/doctors/password",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "doctors", "password"]
+            }
+          }
+        },
+        {
+          "name": "Create a Slot",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "<REPLACE_WITH_DOCTOR_TOKEN>", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2026-03-25T00:00:00.000Z\",\n  \"startTime\": \"2026-03-25T09:00:00.000Z\",\n  \"endTime\": \"2026-03-25T09:30:00.000Z\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/doctors/slots",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "doctors", "slots"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Patients",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "<REPLACE_WITH_PATIENT_TOKEN>", "type": "string" }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/patients/profile",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "patients", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Search Doctors",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "<REPLACE_WITH_PATIENT_TOKEN>", "type": "string" }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/patients/doctors?specialty=Neurology",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "patients", "doctors"]
+            }
+          }
+        },
+        {
+          "name": "Book Appointment",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "<REPLACE_WITH_PATIENT_TOKEN>", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"slotId\": 1\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/patients/appointments",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "patients", "appointments"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

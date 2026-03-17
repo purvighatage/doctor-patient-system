@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET;
 
 const registerPatient = async (data) => {
-  const { name, email, password } = data;
+  const { name, email, phone, dob, password } = data;
 
   const existingUser = await prisma.user.findUnique({
     where: { email },
@@ -23,11 +23,23 @@ const registerPatient = async (data) => {
       email,
       password: hashedPassword,
       role: "PATIENT",
+      patient: {
+        create: {
+          name,
+          email,
+          phone,
+          dob: new Date(dob),
+        },
+      },
+    },
+    include: {
+      patient: true,
     },
   });
 
   return user;
 };
+
 
 const loginUser = async (email, password) => {
   const user = await prisma.user.findUnique({
@@ -41,7 +53,11 @@ const loginUser = async (email, password) => {
   if (!isMatch) throw new Error("Invalid credentials");
 
   const token = jwt.sign(
-    { id: user.id, role: user.role },
+    { 
+      id: user.id, 
+      role: user.role, 
+      mustChangePassword: user.mustChangePassword 
+    },
     JWT_SECRET,
     { expiresIn: "1d" }
   );

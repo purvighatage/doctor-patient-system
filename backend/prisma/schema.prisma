@@ -17,6 +17,7 @@ model User {
   updatedAt DateTime @updatedAt @default(now()) // <-- add @default(now())
   doctor    Doctor?
   patient   Patient?
+  mustChangePassword Boolean @default(false)
 }
 
 enum Role {
@@ -34,6 +35,7 @@ model Doctor {
   fees         Float?
   clinic       String?
   gender       String?
+  photo        String?
   active       Boolean   @default(true)
   user         User      @relation(fields: [userId], references: [id])
   slots        Slot[]

@@ -1,0 +1,110 @@
+### Doctor-Patient Management System API Tests
+### You can use the "REST Client" extension in VS Code to run these directly.
+### Install it from: https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+
+@baseUrl = http://localhost:5000
+
+---
+### 1. Register a new Patient
+# @name registerPatient
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Jane Doe",
+  "email": "jane@example.com",
+  "phone": "9876543210",
+  "dob": "1995-05-15",
+  "password": "securepassword"
+}
+
+---
+### 2. Login as Patient
+# @name loginPatient
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "jane@example.com",
+  "password": "securepassword"
+}
+
+### Copy the token from the response above and set it here to test patient routes
+@patientToken = {"{{loginPatient.response.body.token}}"}
+
+---
+### 3. Get Patient Profile
+GET {{baseUrl}}/api/patients/profile
+Authorization: Bearer {{patientToken}}
+
+---
+### 4. Setup Admin User (Manual DB intervention needed normally, but let's assume one exists or we login as one if seeded)
+# Assuming you have an Admin account in DB
+# POST {{baseUrl}}/api/auth/login
+# Content-Type: application/json
+# { "email": "admin@example.com", "password": "adminpassword" }
+# @adminToken = YOUR_ADMIN_TOKEN_HERE
+
+---
+### 5. Create a Doctor (Requires Admin Token)
+POST {{baseUrl}}/api/admins/doctors
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Dr. Smith",
+  "email": "dr.smith@hospital.com",
+  "specialty": "Cardiology",
+  "qualifications": "MD, MBBS",
+  "experience": 10,
+  "fees": 500,
+  "clinic": "City Heart Center",
+  "gender": "Male"
+}
+
+---
+### 6. Search Doctors (As Patient)
+GET {{baseUrl}}/api/patients/doctors?specialty=Cardiology
+Authorization: Bearer {{patientToken}}
+
+---
+### 7. Get Admin Analytics (Requires Admin Token)
+GET {{baseUrl}}/api/admins/analytics
+Authorization: Bearer {{adminToken}}
+
+---
+### 8. Doctor Login (Using the temp password generated in step 5)
+# @name loginDoctor
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "dr.smith@hospital.com",
+  "password": "TEMP_PASSWORD_FROM_STEP_5"
+}
+
+@doctorToken = {"{{loginDoctor.response.body.token}}"}
+
+---
+### 9. Doctor Changes Password 
+PUT {{baseUrl}}/api/doctors/password
+Authorization: Bearer {{doctorToken}}
+Content-Type: application/json
+
+{
+  "oldPassword": "TEMP_PASSWORD_FROM_STEP_5",
+  "newPassword": "newsecurepassword123"
+}
+
+---
+### 10. Doctor Creates a Slot
+POST {{baseUrl}}/api/doctors/slots
+Authorization: Bearer {{doctorToken}}
+Content-Type: application/json
+
+{
+  "date": "2026-03-20T00:00:00.000Z",
+  "startTime": "2026-03-20T10:00:00.000Z",
+  "endTime": "2026-03-20T10:30:00.000Z"
+}
+

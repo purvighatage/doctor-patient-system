@@ -1,68 +1,107 @@
-const { createDoctor, listDoctors, setDoctorStatus, addSlot, listSlots, updateSlot } = require("./doctor.service");
+const prisma = require("../../config/prisma");
+const bcrypt = require("bcryptjs");
 
-// ===== Admin: Create Doctor =====
-const addDoctor = async (req, res) => {
+// PUT /api/doctors/password
+const updatePassword = async (req, res) => {
   try {
-    const result = await createDoctor(req.body);
-    res.status(201).json(result);
+    const { oldPassword, newPassword } = req.body;
+
+    const user = await prisma.user.findUnique({ where: { id: req.user.id } });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) return res.status(400).json({ message: "Invalid old password" });
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await prisma.user.update({
+      where: { id: req.user.id },
+      data: {
+        password: hashedPassword,
+        mustChangePassword: false
+      }
+    });
+
+    res.json({ message: "Password updated successfully" });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
-// ===== Admin: List Doctors =====
-const getDoctors = async (req, res) => {
-  try {
-    const doctors = await listDoctors();
-    res.json(doctors);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-};
-
-// ===== Admin: Activate/Deactivate =====
-const updateDoctorStatus = async (req, res) => {
-  try {
-    const doctorId = parseInt(req.params.id);
-    const { active } = req.body;
-    const result = await setDoctorStatus(doctorId, active);
-    res.json(result);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-};
-
-// ===== Doctor: Add Slot =====
+// POST /api/doctors/slots
 const createSlot = async (req, res) => {
   try {
-    const doctorId = req.user.id; // use logged-in doctor id
-    const result = await addSlot({ ...req.body, doctorId });
-    res.status(201).json(result);
+    const { date, startTime, endTime } = req.body;
+
+    const doctor = await prisma.doctor.findUnique({ where: { userId: req.user.id } });
+    if (!doctor) return res.status(404).json({ message: "Doctor profile not found" });
+
+    // Ensure slot doesn't already exist for this doctor/date/time
+    const existingSlot = await prisma.slot.findFirst({
+      where: {
+        doctorId: doctor.id,
+        date: new Date(date),
+        startTime: new Date(startTime)
+      }
+    });
+
+    if (existingSlot) {
+      return res.status(400).json({ message: "Slot already exists at this time" });
+    }
+
+    const slot = await prisma.slot.create({
+      data: {
+        doctorId: doctor.id,
+        date: new Date(date),
+        startTime: new Date(startTime),
+        endTime: new Date(endTime),
+        booked: false
+      }
+    });
+
+    res.status(201).json({ message: "Slot created successfully", slot });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
-// ===== Doctor: List Slots =====
+// GET /api/doctors/slots
 const getSlots = async (req, res) => {
   try {
-    const doctorId = req.user.id;
-    const slots = await listSlots(doctorId);
+    const doctor = await prisma.doctor.findUnique({ where: { userId: req.user.id } });
+    if (!doctor) return res.status(404).json({ message: "Doctor profile not found" });
+
+    const slots = await prisma.slot.findMany({
+      where: { doctorId: doctor.id },
+      orderBy: [{ date: 'asc' }, { startTime: 'asc' }]
+    });
+
     res.json(slots);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
-// ===== Doctor: Update Slot =====
-const modifySlot = async (req, res) => {
+// DELETE /api/doctors/slots/:id
+const deleteSlot = async (req, res) => {
   try {
-    const slotId = parseInt(req.params.id);
-    const result = await updateSlot(slotId, req.body);
-    res.json(result);
+    const { id } = req.params;
+
+    const slot = await prisma.slot.findUnique({ where: { id: parseInt(id) } });
+    if (!slot) return res.status(404).json({ message: "Slot not found" });
+    if (slot.booked) return res.status(400).json({ message: "Cannot delete a booked slot" });
+
+    await prisma.slot.delete({ where: { id: parseInt(id) } });
+
+    res.json({ message: "Slot deleted successfully" });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
-module.exports = { addDoctor, getDoctors, updateDoctorStatus, createSlot, getSlots, modifySlot };
+module.exports = {
+  updatePassword,
+  createSlot,
+  getSlots,
+  deleteSlot
+};
