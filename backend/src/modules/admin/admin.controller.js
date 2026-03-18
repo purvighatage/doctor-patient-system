@@ -7,6 +7,19 @@ const createDoctor = async (req, res) => {
   try {
     const { name, email, specialty, qualifications, experience, fees, clinic, gender, photo } = req.body;
     
+    // Validate required fields
+    if (!name || !email || !specialty) {
+      return res.status(400).json({ message: "Name, email, and specialty are required fields" });
+    }
+
+    // Validate numeric fields are non-negative
+    const exp = parseInt(experience) || 0;
+    const fee = parseFloat(fees) || 0;
+    
+    if (exp < 0 || fee < 0) {
+      return res.status(400).json({ message: "Experience and fees cannot be negative" });
+    }
+
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) return res.status(400).json({ message: "User with this email already exists" });
 
@@ -53,12 +66,26 @@ const toggleDoctorStatus = async (req, res) => {
     const { id } = req.params;
     const { active } = req.body;
 
+    const doctorId = parseInt(id);
+    if (isNaN(doctorId)) {
+      return res.status(400).json({ message: "Invalid doctor ID format" });
+    }
+
     if (typeof active !== 'boolean') {
       return res.status(400).json({ message: "active field must be a boolean" });
     }
 
+    // Check if the doctor exists first
+    const existingDoctor = await prisma.doctor.findUnique({
+      where: { id: doctorId }
+    });
+
+    if (!existingDoctor) {
+      return res.status(404).json({ message: "Doctor not found" });
+    }
+
     const doctor = await prisma.doctor.update({
-      where: { id: parseInt(id) },
+      where: { id: doctorId },
       data: { active }
     });
 
@@ -136,8 +163,58 @@ const getAnalytics = async (req, res) => {
   }
 };
 
+// GET /api/admins/doctors
+const getAllDoctors = async (req, res) => {
+  try {
+    const doctors = await prisma.doctor.findMany({
+      include: {
+        user: { select: { email: true, createdAt: true } }
+      },
+      orderBy: { id: 'desc' }
+    });
+    res.json(doctors);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// GET /api/admins/patients
+const getAllPatients = async (req, res) => {
+  try {
+    const patients = await prisma.patient.findMany({
+      include: {
+        user: { select: { createdAt: true } }
+      },
+      orderBy: { id: 'desc' }
+    });
+    res.json(patients);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// GET /api/admins/appointments
+const getAllAppointments = async (req, res) => {
+  try {
+    const appointments = await prisma.appointment.findMany({
+      include: {
+        patient: { select: { name: true, email: true } },
+        doctor: { select: { name: true, specialty: true } },
+        slot: { select: { date: true, startTime: true, endTime: true } }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(appointments);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 module.exports = {
   createDoctor,
   toggleDoctorStatus,
-  getAnalytics
+  getAnalytics,
+  getAllDoctors,
+  getAllPatients,
+  getAllAppointments
 };

@@ -1,6 +1,5 @@
 ### Doctor-Patient Management System API Tests
-### You can use the "REST Client" extension in VS Code to run these directly.
-### Install it from: https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+### REST Client Extension (VS Code)
 
 @baseUrl = http://localhost:5000
 
@@ -11,11 +10,11 @@ POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
-  "name": "Jane Doe",
-  "email": "jane@example.com",
-  "phone": "9876543210",
-  "dob": "1995-05-15",
-  "password": "securepassword"
+  "name": "Rahul Verma",
+  "email": "rahul.verma01@testmail.com",
+  "phone": "9123456780",
+  "dob": "1998-08-21",
+  "password": "rahulPass@123"
 }
 
 ---
@@ -25,12 +24,11 @@ POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "jane@example.com",
-  "password": "securepassword"
+  "email": "rahul.verma01@testmail.com",
+  "password": "rahulPass@123"
 }
 
-### Copy the token from the response above and set it here to test patient routes
-@patientToken = {"{{loginPatient.response.body.token}}"}
+@patientToken = {{loginPatient.response.body.token}}
 
 ---
 ### 3. Get Patient Profile
@@ -38,73 +36,143 @@ GET {{baseUrl}}/api/patients/profile
 Authorization: Bearer {{patientToken}}
 
 ---
-### 4. Setup Admin User (Manual DB intervention needed normally, but let's assume one exists or we login as one if seeded)
-# Assuming you have an Admin account in DB
-# POST {{baseUrl}}/api/auth/login
-# Content-Type: application/json
-# { "email": "admin@example.com", "password": "adminpassword" }
-# @adminToken = YOUR_ADMIN_TOKEN_HERE
+### 4. Login Admin (Seed User)
+# @name loginAdmin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@system.com",
+  "password": "admin123"
+}
+
+@adminToken = {{loginAdmin.response.body.token}}
 
 ---
-### 5. Create a Doctor (Requires Admin Token)
+### 5. Create a Doctor (Admin)
 POST {{baseUrl}}/api/admins/doctors
 Authorization: Bearer {{adminToken}}
 Content-Type: application/json
 
 {
-  "name": "Dr. Smith",
-  "email": "dr.smith@hospital.com",
-  "specialty": "Cardiology",
-  "qualifications": "MD, MBBS",
-  "experience": 10,
-  "fees": 500,
-  "clinic": "City Heart Center",
-  "gender": "Male"
+  "name": "Dr. Anjali Mehta",
+  "email": "anjali.mehta@healthcare.com",
+  "specialty": "Dermatology",
+  "qualifications": "MBBS, MD Dermatology",
+  "experience": 8,
+  "fees": 700,
+  "clinic": "SkinCare Clinic",
+  "gender": "Female"
 }
 
 ---
-### 6. Search Doctors (As Patient)
-GET {{baseUrl}}/api/patients/doctors?specialty=Cardiology
+### 6. Search Doctors
+GET {{baseUrl}}/api/patients/doctors?specialty=Dermatology
 Authorization: Bearer {{patientToken}}
 
 ---
-### 7. Get Admin Analytics (Requires Admin Token)
+### 7. Get Specific Doctor Profile
+GET {{baseUrl}}/api/patients/doctors/1
+Authorization: Bearer {{patientToken}}
+
+---
+### 8. Admin Analytics
 GET {{baseUrl}}/api/admins/analytics
 Authorization: Bearer {{adminToken}}
 
 ---
-### 8. Doctor Login (Using the temp password generated in step 5)
+### 9. Doctor Login (Use temp password returned in Step 5)
 # @name loginDoctor
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "dr.smith@hospital.com",
+  "email": "anjali.mehta@healthcare.com",
   "password": "TEMP_PASSWORD_FROM_STEP_5"
 }
 
-@doctorToken = {"{{loginDoctor.response.body.token}}"}
+@doctorToken = {{loginDoctor.response.body.token}}
 
 ---
-### 9. Doctor Changes Password 
+### 10. Doctor Changes Password
 PUT {{baseUrl}}/api/doctors/password
 Authorization: Bearer {{doctorToken}}
 Content-Type: application/json
 
 {
   "oldPassword": "TEMP_PASSWORD_FROM_STEP_5",
-  "newPassword": "newsecurepassword123"
+  "newPassword": "DoctorSecure@456"
 }
 
 ---
-### 10. Doctor Creates a Slot
+### 11. Doctor Creates Slot
 POST {{baseUrl}}/api/doctors/slots
 Authorization: Bearer {{doctorToken}}
 Content-Type: application/json
 
 {
-  "date": "2026-03-20T00:00:00.000Z",
-  "startTime": "2026-03-20T10:00:00.000Z",
-  "endTime": "2026-03-20T10:30:00.000Z"
+  "date": "2026-04-02T00:00:00.000Z",
+  "startTime": "2026-04-02T11:00:00.000Z",
+  "endTime": "2026-04-02T11:30:00.000Z"
 }
 
+---
+### 12. Doctor Views Slots
+GET {{baseUrl}}/api/doctors/slots
+Authorization: Bearer {{doctorToken}}
+
+---
+### 13. Doctor Deletes Slot
+DELETE {{baseUrl}}/api/doctors/slots/2
+Authorization: Bearer {{doctorToken}}
+
+---
+### 14. Admin Views Doctors
+GET {{baseUrl}}/api/admins/doctors
+Authorization: Bearer {{adminToken}}
+
+---
+### 15. Admin Views Patients
+GET {{baseUrl}}/api/admins/patients
+Authorization: Bearer {{adminToken}}
+
+---
+### 16. Admin Views Appointments
+GET {{baseUrl}}/api/admins/appointments
+Authorization: Bearer {{adminToken}}
+
+---
+### 17. Patient Books Appointment
+POST {{baseUrl}}/api/patients/appointments
+Authorization: Bearer {{patientToken}}
+Content-Type: application/json
+
+{
+  "slotId": 2,
+  "clientTime": "2026-04-02T11:00:00.000Z"
+}
+
+---
+### 18. Patient Appointment History
+GET {{baseUrl}}/api/patients/appointments
+Authorization: Bearer {{patientToken}}
+
+---
+### 19. Patient Cancels Appointment
+PUT {{baseUrl}}/api/patients/appointments/1/cancel
+Authorization: Bearer {{patientToken}}
+
+---
+### 20. Doctor Views Appointments
+GET {{baseUrl}}/api/doctors/appointments
+Authorization: Bearer {{doctorToken}}
+
+---
+### 21. Doctor Updates Appointment Status
+PATCH {{baseUrl}}/api/doctors/appointments/1/status
+Authorization: Bearer {{doctorToken}}
+Content-Type: application/json
+
+{
+  "status": "COMPLETED"
+}

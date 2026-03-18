@@ -13,10 +13,14 @@ async function createSlot({ doctorId, date, startTime, endTime }) {
   });
 }
 
-// List slots for a doctor (only available slots)
+// List slots for a doctor (only available slots, not in the past)
 async function listSlots(doctorId) {
   return await prisma.slot.findMany({
-    where: { doctorId, booked: false },
+    where: { 
+      doctorId, 
+      booked: false,
+      startTime: { gte: new Date() }
+    },
     orderBy: { startTime: "asc" },
   });
 }

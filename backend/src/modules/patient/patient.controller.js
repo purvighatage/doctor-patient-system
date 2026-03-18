@@ -39,7 +39,8 @@ const getDoctors = async (req, res) => {
     
     // Slot filtering
     if (date || startTime) {
-      filters.slots = { some: { booked: false } };
+      const now = new Date();
+      filters.slots = { some: { booked: false, startTime: { gte: now } } };
       if (date) filters.slots.some.date = new Date(date);
       if (startTime) filters.slots.some.startTime = new Date(startTime);
     }
@@ -50,6 +51,7 @@ const getDoctors = async (req, res) => {
         slots: {
           where: {
             booked: false,
+            startTime: { gte: new Date() },
             ...(date && { date: new Date(date) }),
           },
           orderBy: { startTime: 'asc' }
@@ -67,8 +69,14 @@ const getDoctors = async (req, res) => {
 const getDoctorById = async (req, res) => {
   try {
     const { id } = req.params;
+    const doctorId = parseInt(id);
+
+    if (isNaN(doctorId)) {
+      return res.status(400).json({ message: "Invalid doctor ID format" });
+    }
+
     const doctor = await prisma.doctor.findUnique({
-      where: { id: parseInt(id) },
+      where: { id: doctorId },
       include: {
         slots: {
           where: { booked: false, startTime: { gte: new Date() } },
@@ -87,8 +95,12 @@ const getDoctorById = async (req, res) => {
 // POST /api/patients/appointments
 const bookAppointment = async (req, res) => {
   try {
-    const { slotId } = req.body;
+    const { slotId, clientTime } = req.body;
     
+    if (!slotId || typeof slotId !== 'number') {
+      return res.status(400).json({ message: "A valid slotId is required" });
+    }
+
     const patient = await prisma.patient.findUnique({ where: { userId: req.user.id }});
     if (!patient) return res.status(404).json({ message: "Patient not found" });
 
@@ -98,6 +110,27 @@ const bookAppointment = async (req, res) => {
       
       if (!slot) throw new Error("Slot not found");
       if (slot.booked) throw new Error("Slot is already booked");
+      
+      const currentTime = clientTime ? new Date(clientTime) : new Date();
+      if (slot.startTime < currentTime) throw new Error("Cannot book slots in the past");
+
+      // Prevent double booking for the same patient at the exact same time
+      const conflictingAppointment = await tx.appointment.findFirst({
+        where: {
+           patientId: patient.id,
+           status: { in: ["PENDING", "BOOKED"] },
+           slot: {
+             AND: [
+                { startTime: { lt: slot.endTime } },
+                { endTime: { gt: slot.startTime } }
+             ]
+           }
+        }
+      });
+
+      if (conflictingAppointment) {
+         throw new Error("You already have an appointment booked during this time");
+      }
 
       const updatedSlot = await tx.slot.update({
         where: { id: slotId },
@@ -141,9 +174,14 @@ const bookAppointment = async (req, res) => {
 const cancelAppointment = async (req, res) => {
   try {
     const { id } = req.params;
+    const appointmentId = parseInt(id);
+
+    if (isNaN(appointmentId)) {
+       return res.status(400).json({ message: "Invalid appointment ID format" });
+    }
     
     const appointment = await prisma.appointment.findUnique({
-      where: { id: parseInt(id) },
+      where: { id: appointmentId },
       include: { slot: true, patient: true }
     });
 

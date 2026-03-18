@@ -12,7 +12,7 @@ const registerPatient = async (data) => {
   });
 
   if (existingUser) {
-    throw new Error("User already exists");
+    throw new Error("patient exist , please login");
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
