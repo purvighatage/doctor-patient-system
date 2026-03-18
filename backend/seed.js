@@ -17,7 +17,14 @@ async function seedAdmin() {
         name: 'System Admin',
         email: 'admin@system.com',
         password: hash,
-        role: 'ADMIN'
+        role: 'ADMIN',
+        hospital: {
+          create: {
+            name: "Default Hospital",
+            address: "123 Default Street",
+            phone: "+1-800-DEFAULT"
+          }
+        }
       }
     });
     console.log('Admin user seeded successfully. Use email: admin@system.com, password: admin123');

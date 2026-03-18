@@ -10,11 +10,11 @@ POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
-  "name": "Rahul Verma",
-  "email": "rahul.verma01@testmail.com",
-  "phone": "9123456780",
-  "dob": "1998-08-21",
-  "password": "rahulPass@123"
+  "name": "Karan Singhania",
+  "email": "karan.singhania2026@testmail.com",
+  "phone": "9988776655",
+  "dob": "1994-11-03",
+  "password": "KaranPassword#1"
 }
 
 ---
@@ -24,8 +24,8 @@ POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "rahul.verma01@testmail.com",
-  "password": "rahulPass@123"
+  "email": "karan.singhania2026@testmail.com",
+  "password": "KaranPassword#1"
 }
 
 @patientToken = {{loginPatient.response.body.token}}
@@ -50,51 +50,68 @@ Content-Type: application/json
 
 ---
 ### 5. Create a Doctor (Admin)
+### Note: This doctor will be automatically attached to this Admin's active Hospital!
 POST {{baseUrl}}/api/admins/doctors
 Authorization: Bearer {{adminToken}}
 Content-Type: application/json
 
 {
-  "name": "Dr. Anjali Mehta",
-  "email": "anjali.mehta@healthcare.com",
-  "specialty": "Dermatology",
-  "qualifications": "MBBS, MD Dermatology",
-  "experience": 8,
-  "fees": 700,
-  "clinic": "SkinCare Clinic",
-  "gender": "Female"
+  "name": "Dr. Sameer Kapoor",
+  "email": "sameer.kapoor@healthworld.com",
+  "specialty": "Neurology",
+  "qualifications": "MBBS, MD Neurology",
+  "experience": 12,
+  "fees": 1200,
+  "clinic": "HealthWorld Neurological",
+  "gender": "Male"
 }
 
 ---
-### 6. Search Doctors
-GET {{baseUrl}}/api/patients/doctors?specialty=Dermatology
+### 6. Toggle Doctor Active Status (Admin)
+PATCH {{baseUrl}}/api/admins/doctors/1/status
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "active": false
+}
+
+---
+### 7. View Platform Doctors (Public - No Token)
+GET {{baseUrl}}/api/public/doctors
+
+---
+### 8. Search Doctors (Patient)
+### Note: This now includes the strict Hospital name and address in the response!
+GET {{baseUrl}}/api/patients/doctors?specialty=Neurology
 Authorization: Bearer {{patientToken}}
 
 ---
-### 7. Get Specific Doctor Profile
+### 9. Get Specific Doctor Profile (Patient)
 GET {{baseUrl}}/api/patients/doctors/1
 Authorization: Bearer {{patientToken}}
 
 ---
-### 8. Admin Analytics
+### 10. Admin Analytics (Admin - Scoped)
+### Note: Admins can only see stats relating to THEIR hospital!
 GET {{baseUrl}}/api/admins/analytics
 Authorization: Bearer {{adminToken}}
 
 ---
-### 9. Doctor Login (Use temp password returned in Step 5)
+### 11. Doctor Login (Use temp password returned in Step 5)
 # @name loginDoctor
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "anjali.mehta@healthcare.com",
+  "email": "sameer.kapoor@healthworld.com",
   "password": "TEMP_PASSWORD_FROM_STEP_5"
 }
 
 @doctorToken = {{loginDoctor.response.body.token}}
 
 ---
-### 10. Doctor Changes Password
+### 12. Doctor Changes Password
 PUT {{baseUrl}}/api/doctors/password
 Authorization: Bearer {{doctorToken}}
 Content-Type: application/json
@@ -105,7 +122,7 @@ Content-Type: application/json
 }
 
 ---
-### 11. Doctor Creates Slot
+### 13. Doctor Creates Slot
 POST {{baseUrl}}/api/doctors/slots
 Authorization: Bearer {{doctorToken}}
 Content-Type: application/json
@@ -117,32 +134,32 @@ Content-Type: application/json
 }
 
 ---
-### 12. Doctor Views Slots
+### 14. Doctor Views Slots
 GET {{baseUrl}}/api/doctors/slots
 Authorization: Bearer {{doctorToken}}
 
 ---
-### 13. Doctor Deletes Slot
+### 15. Doctor Deletes Slot
 DELETE {{baseUrl}}/api/doctors/slots/2
 Authorization: Bearer {{doctorToken}}
 
 ---
-### 14. Admin Views Doctors
+### 16. Admin Views Doctors (Scoped)
 GET {{baseUrl}}/api/admins/doctors
 Authorization: Bearer {{adminToken}}
 
 ---
-### 15. Admin Views Patients
+### 17. Admin Views Patients (Scoped)
 GET {{baseUrl}}/api/admins/patients
-Authorization: Bearer {{adminToken}}
+Authorization: Bearer {{adminToken}} giving [] although it has patients in db
 
 ---
-### 16. Admin Views Appointments
+### 18. Admin Views Appointments (Scoped)
 GET {{baseUrl}}/api/admins/appointments
 Authorization: Bearer {{adminToken}}
 
 ---
-### 17. Patient Books Appointment
+### 19. Patient Books Appointment
 POST {{baseUrl}}/api/patients/appointments
 Authorization: Bearer {{patientToken}}
 Content-Type: application/json
@@ -153,22 +170,22 @@ Content-Type: application/json
 }
 
 ---
-### 18. Patient Appointment History
+### 20. Patient Appointment History
 GET {{baseUrl}}/api/patients/appointments
 Authorization: Bearer {{patientToken}}
 
 ---
-### 19. Patient Cancels Appointment
+### 21. Patient Cancels Appointment
 PUT {{baseUrl}}/api/patients/appointments/1/cancel
 Authorization: Bearer {{patientToken}}
 
 ---
-### 20. Doctor Views Appointments
+### 22. Doctor Views Appointments
 GET {{baseUrl}}/api/doctors/appointments
 Authorization: Bearer {{doctorToken}}
 
 ---
-### 21. Doctor Updates Appointment Status
+### 23. Doctor Updates Appointment Status
 PATCH {{baseUrl}}/api/doctors/appointments/1/status
 Authorization: Bearer {{doctorToken}}
 Content-Type: application/json

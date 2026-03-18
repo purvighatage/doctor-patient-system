@@ -48,6 +48,9 @@ const getDoctors = async (req, res) => {
     const doctors = await prisma.doctor.findMany({
       where: filters,
       include: {
+        hospital: {
+          select: { name: true, address: true, phone: true }
+        },
         slots: {
           where: {
             booked: false,
@@ -78,6 +81,9 @@ const getDoctorById = async (req, res) => {
     const doctor = await prisma.doctor.findUnique({
       where: { id: doctorId },
       include: {
+        hospital: {
+          select: { name: true, address: true, phone: true }
+        },
         slots: {
           where: { booked: false, startTime: { gte: new Date() } },
           orderBy: { startTime: 'asc' }

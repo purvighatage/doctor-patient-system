@@ -23,6 +23,9 @@ const createDoctor = async (req, res) => {
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) return res.status(400).json({ message: "User with this email already exists" });
 
+    const hospital = await prisma.hospital.findUnique({ where: { adminId: req.user.id } });
+    if (!hospital) return res.status(400).json({ message: "Admin is not assigned to a hospital" });
+
     // Generate a secure temporary password
     const tempPassword = crypto.randomBytes(8).toString('hex');
     const hashedPassword = await bcrypt.hash(tempPassword, 10);
@@ -43,7 +46,8 @@ const createDoctor = async (req, res) => {
             fees: parseFloat(fees) || 0,
             clinic,
             gender,
-            photo
+            photo,
+            hospitalId: hospital.id
           }
         }
       },
@@ -52,7 +56,7 @@ const createDoctor = async (req, res) => {
 
     res.status(201).json({
       message: "Doctor created successfully",
-      tempPassword, // In a real app, this should be sent via email
+      tempPassword,
       doctor: user.doctor
     });
   } catch (err) {
@@ -75,13 +79,16 @@ const toggleDoctorStatus = async (req, res) => {
       return res.status(400).json({ message: "active field must be a boolean" });
     }
 
-    // Check if the doctor exists first
+    const hospital = await prisma.hospital.findUnique({ where: { adminId: req.user.id } });
+    if (!hospital) return res.status(400).json({ message: "Admin is not assigned to a hospital" });
+
+    // Check if the doctor exists and belongs to this hospital
     const existingDoctor = await prisma.doctor.findUnique({
       where: { id: doctorId }
     });
 
-    if (!existingDoctor) {
-      return res.status(404).json({ message: "Doctor not found" });
+    if (!existingDoctor || existingDoctor.hospitalId !== hospital.id) {
+      return res.status(404).json({ message: "Doctor not found in your hospital" });
     }
 
     const doctor = await prisma.doctor.update({
@@ -98,18 +105,22 @@ const toggleDoctorStatus = async (req, res) => {
 // GET /api/admins/analytics
 const getAnalytics = async (req, res) => {
   try {
-    // Basic Counts
-    const totalPatients = await prisma.patient.count();
-    const activeDoctors = await prisma.doctor.count({ where: { active: true } });
-    const totalAppointments = await prisma.appointment.count();
+    const hospital = await prisma.hospital.findUnique({ where: { adminId: req.user.id } });
+    if (!hospital) return res.status(400).json({ message: "Admin is not assigned to a hospital" });
+
+    const activeDoctors = await prisma.doctor.count({ where: { active: true, hospitalId: hospital.id } });
+    const totalAppointments = await prisma.appointment.count({ where: { doctor: { hospitalId: hospital.id } } });
     
-    const cancelledAppts = await prisma.appointment.count({ where: { status: "CANCELLED" }});
+    const cancelledAppts = await prisma.appointment.count({ where: { status: "CANCELLED", doctor: { hospitalId: hospital.id } }});
     const cancellationRate = totalAppointments === 0 ? 0 : (cancelledAppts / totalAppointments) * 100;
 
-    // Most Booked Specialty
     const appsWithDoctor = await prisma.appointment.findMany({
+      where: { doctor: { hospitalId: hospital.id } },
       include: { doctor: true }
     });
+
+    const patientIds = new Set(appsWithDoctor.map(a => a.patientId));
+    const totalPatients = patientIds.size;
 
     const specialtyCounts = {};
     const doctorCounts = {};
@@ -133,7 +144,7 @@ const getAnalytics = async (req, res) => {
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
     const recentAppointments = await prisma.appointment.findMany({
-      where: { createdAt: { gte: thirtyDaysAgo } },
+      where: { createdAt: { gte: thirtyDaysAgo }, doctor: { hospitalId: hospital.id } },
       select: { createdAt: true }
     });
 
@@ -166,7 +177,11 @@ const getAnalytics = async (req, res) => {
 // GET /api/admins/doctors
 const getAllDoctors = async (req, res) => {
   try {
+    const hospital = await prisma.hospital.findUnique({ where: { adminId: req.user.id } });
+    if (!hospital) return res.status(400).json({ message: "Admin is not assigned to a hospital" });
+
     const doctors = await prisma.doctor.findMany({
+      where: { hospitalId: hospital.id },
       include: {
         user: { select: { email: true, createdAt: true } }
       },
@@ -181,7 +196,17 @@ const getAllDoctors = async (req, res) => {
 // GET /api/admins/patients
 const getAllPatients = async (req, res) => {
   try {
+    const hospital = await prisma.hospital.findUnique({ where: { adminId: req.user.id } });
+    if (!hospital) return res.status(400).json({ message: "Admin is not assigned to a hospital" });
+
+    const appointments = await prisma.appointment.findMany({
+      where: { doctor: { hospitalId: hospital.id } },
+      select: { patientId: true }
+    });
+    const patientIds = [...new Set(appointments.map(a => a.patientId))];
+
     const patients = await prisma.patient.findMany({
+      where: { id: { in: patientIds } },
       include: {
         user: { select: { createdAt: true } }
       },
@@ -196,7 +221,11 @@ const getAllPatients = async (req, res) => {
 // GET /api/admins/appointments
 const getAllAppointments = async (req, res) => {
   try {
+    const hospital = await prisma.hospital.findUnique({ where: { adminId: req.user.id } });
+    if (!hospital) return res.status(400).json({ message: "Admin is not assigned to a hospital" });
+
     const appointments = await prisma.appointment.findMany({
+      where: { doctor: { hospitalId: hospital.id } },
       include: {
         patient: { select: { name: true, email: true } },
         doctor: { select: { name: true, specialty: true } },
