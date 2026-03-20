@@ -18,6 +18,21 @@ Content-Type: application/json
 }
 
 ---
+### 1.5 Register a new Hospital and Admin
+# @name registerHospital
+POST {{baseUrl}}/api/auth/register-hospital
+Content-Type: application/json
+
+{
+  "adminName": "City Hospital Admin",
+  "email": "admin@cityhospital.com",
+  "password": "SecurePassword123!",
+  "hospitalName": "City Central Hospital",
+  "address": "456 City Center Avenue",
+  "phone": "9876543210"
+}
+
+---
 ### 2. Login as Patient
 # @name loginPatient
 POST {{baseUrl}}/api/auth/login
@@ -42,8 +57,8 @@ POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "admin@system.com",
-  "password": "admin123"
+  "email": "admin@cityhospital.com",
+  "password": "SecurePassword123!"
 }
 
 @adminToken = {{loginAdmin.response.body.token}}

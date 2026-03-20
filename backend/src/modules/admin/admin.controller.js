@@ -1,6 +1,7 @@
 const prisma = require("../../config/prisma");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
+const { validateEmail, validateName } = require("../../utils/validators");
 
 // POST /api/admins/doctors
 const createDoctor = async (req, res) => {
@@ -8,8 +9,8 @@ const createDoctor = async (req, res) => {
     const { name, email, specialty, qualifications, experience, fees, clinic, gender, photo } = req.body;
     
     // Validate required fields
-    if (!name || !email || !specialty) {
-      return res.status(400).json({ message: "Name, email, and specialty are required fields" });
+    if (!validateName(name) || !email || !specialty) {
+      return res.status(400).json({ message: "Valid name, email, and specialty are required fields" });
     }
 
     // Validate numeric fields are non-negative
@@ -88,7 +89,7 @@ const toggleDoctorStatus = async (req, res) => {
     });
 
     if (!existingDoctor || existingDoctor.hospitalId !== hospital.id) {
-      return res.status(404).json({ message: "Doctor not found in your hospital" });
+      return res.status(403).json({ message: "Forbidden: cannot manage doctors outside your hospital" });
     }
 
     const doctor = await prisma.doctor.update({
@@ -136,8 +137,8 @@ const getAnalytics = async (req, res) => {
       doctorCounts[docName]++;
     });
 
-    const mostBookedSpecialty = Object.keys(specialtyCounts).sort((a,b) => specialtyCounts[b] - specialtyCounts[a])[0] || null;
-    const mostBookedDoctor = Object.keys(doctorCounts).sort((a,b) => doctorCounts[b] - doctorCounts[a])[0] || null;
+    const mostBookedSpecialty = Object.entries(specialtyCounts).map(([label, value]) => ({ label, value })).sort((a,b) => b.value - a.value);
+    const mostBookedDoctor = Object.entries(doctorCounts).map(([label, value]) => ({ label, value })).sort((a,b) => b.value - a.value);
 
     // Appointments over time (last 30 days)
     const thirtyDaysAgo = new Date();

@@ -1,13 +1,40 @@
 const {
   registerPatient,
   loginUser,
+  registerAdminWithHospital,
 } = require("./auth.service");
+const { validateEmail, validatePhone, validateName } = require("../../utils/validators");
+
+const registerHospital = async (req, res) => {
+  try {
+    const { adminName, email, password, hospitalName, address, phone } = req.body;
+    if (!validateName(adminName) || !email || !password || !validateName(hospitalName) || !address) {
+      return res.status(400).json({ message: "Valid Admin name, email, password, valid hospital name, and address are required" });
+    }
+    if (!validateEmail(email)) {
+      return res.status(400).json({ message: "Invalid admin email format" });
+    }
+    if (phone && !validatePhone(phone)) {
+      return res.status(400).json({ message: "Invalid hospital phone number format" });
+    }
+    const user = await registerAdminWithHospital(req.body);
+    res.status(201).json({ message: "Hospital and Admin registered successfully", user });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
 
 const register = async (req, res) => {
   try {
     const { name, email, phone, dob, password } = req.body;
-    if (!name || !email || !phone || !dob || !password) {
-      return res.status(400).json({ message: "All fields (name, email, phone, dob, password) are required" });
+    if (!validateName(name) || !email || !phone || !dob || !password) {
+      return res.status(400).json({ message: "All fields (valid name, email, phone, dob, password) are required" });
+    }
+    if (!validateEmail(email)) {
+      return res.status(400).json({ message: "Invalid patient email format" });
+    }
+    if (!validatePhone(phone)) {
+      return res.status(400).json({ message: "Invalid patient phone number format" });
     }
     const user = await registerPatient(req.body);
     res.status(201).json(user);
@@ -29,4 +56,4 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, login };
+module.exports = { register, login, registerHospital };

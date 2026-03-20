@@ -65,4 +65,39 @@ const loginUser = async (email, password) => {
   return { token, user };
 };
 
-module.exports = { registerPatient, loginUser };
+const registerAdminWithHospital = async (data) => {
+  const { adminName, email, password, hospitalName, address, phone } = data;
+
+  const existingUser = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (existingUser) {
+    throw new Error("User exist, please login");
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const user = await prisma.user.create({
+    data: {
+      name: adminName,
+      email,
+      password: hashedPassword,
+      role: "ADMIN",
+      hospital: {
+        create: {
+          name: hospitalName,
+          address,
+          phone,
+        },
+      },
+    },
+    include: {
+      hospital: true,
+    },
+  });
+
+  return user;
+};
+
+module.exports = { registerPatient, loginUser, registerAdminWithHospital };

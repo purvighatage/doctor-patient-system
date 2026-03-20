@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
-require("dotenv").config();
+// require("dotenv").config();
 
 // Routes
 const authRoutes = require("./modules/auth/auth.routes");
@@ -34,7 +34,11 @@ app.get("/test", (req, res) => {
   res.send("API is working 🚀");
 });
 // Start server
+// Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+// Force the event loop to stay alive
+setInterval(() => {}, 1000 * 60 * 60);
