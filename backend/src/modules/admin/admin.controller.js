@@ -209,11 +209,21 @@ const getAllPatients = async (req, res) => {
     const patients = await prisma.patient.findMany({
       where: { id: { in: patientIds } },
       include: {
-        user: { select: { createdAt: true } }
+        user: { select: { email: true, createdAt: true } },
+        appointments: {
+          where: { doctor: { hospitalId: hospital.id } },
+          include: { doctor: { select: { name: true } } }
+        }
       },
       orderBy: { id: 'desc' }
     });
-    res.json(patients);
+
+    const mappedPatients = patients.map(p => ({
+      ...p,
+      treatingDoctors: [...new Set(p.appointments.map(a => a.doctor.name))]
+    }));
+
+    res.json(mappedPatients);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

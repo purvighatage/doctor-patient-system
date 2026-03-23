@@ -10,11 +10,11 @@ POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
-  "name": "Karan Singhania",
-  "email": "karan.singhania2026@testmail.com",
-  "phone": "9988776655",
-  "dob": "1994-11-03",
-  "password": "KaranPassword#1"
+  "name": "Rahul Sharma",
+  "email": "rahul.sharma88@testmail.com",
+  "phone": "9812345670",
+  "dob": "1988-05-15",
+  "password": "RahulSecretPassword@2026"
 }
 
 ---
@@ -24,12 +24,12 @@ POST {{baseUrl}}/api/auth/register-hospital
 Content-Type: application/json
 
 {
-  "adminName": "City Hospital Admin",
-  "email": "admin@cityhospital.com",
-  "password": "SecurePassword123!",
-  "hospitalName": "City Central Hospital",
-  "address": "456 City Center Avenue",
-  "phone": "9876543210"
+  "adminName": "Global Health Admin",
+  "email": "admin@globalhealth.com",
+  "password": "GlobalAdminPassword!1",
+  "hospitalName": "Global Health Hospital",
+  "address": "789 Global Boulevard",
+  "phone": "9998887770"
 }
 
 ---
@@ -39,8 +39,8 @@ POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "karan.singhania2026@testmail.com",
-  "password": "KaranPassword#1"
+  "email": "rahul.sharma88@testmail.com",
+  "password": "RahulSecretPassword@2026"
 }
 
 @patientToken = {{loginPatient.response.body.token}}
@@ -51,14 +51,14 @@ GET {{baseUrl}}/api/patients/profile
 Authorization: Bearer {{patientToken}}
 
 ---
-### 4. Login Admin (Seed User)
+### 4. Login Admin (Newly Registered Admin)
 # @name loginAdmin
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "admin@cityhospital.com",
-  "password": "SecurePassword123!"
+  "email": "admin@globalhealth.com",
+  "password": "GlobalAdminPassword!1"
 }
 
 @adminToken = {{loginAdmin.response.body.token}}
@@ -71,13 +71,13 @@ Authorization: Bearer {{adminToken}}
 Content-Type: application/json
 
 {
-  "name": "Dr. Sameer Kapoor",
-  "email": "sameer.kapoor@healthworld.com",
+  "name": "Dr. Anil Desai",
+  "email": "anil.desai@globalhealth.com",
   "specialty": "Neurology",
   "qualifications": "MBBS, MD Neurology",
   "experience": 12,
   "fees": 1200,
-  "clinic": "HealthWorld Neurological",
+  "clinic": "Global Health Neurological",
   "gender": "Male"
 }
 
@@ -119,7 +119,7 @@ POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "sameer.kapoor@healthworld.com",
+  "email": "anil.desai@globalhealth.com",
   "password": "TEMP_PASSWORD_FROM_STEP_5"
 }
 

@@ -11,13 +11,15 @@ const {
 
 const router = express.Router();
 
+// Public routes
+router.get("/doctors", getDoctors);
+router.get("/doctors/:id", getDoctorById);
+
 // Apply auth middleware to all patient routes
 router.use(authenticate);
 router.use(authorize("PATIENT"));
 
 router.get("/profile", getProfile);
-router.get("/doctors", getDoctors);
-router.get("/doctors/:id", getDoctorById);
 router.post("/appointments", bookAppointment);
 router.put("/appointments/:id/cancel", cancelAppointment);
 router.get("/appointments", getHistory);

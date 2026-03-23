@@ -23,7 +23,10 @@ const getDoctors = async (req, res) => {
     const filters = { active: true };
 
     if (search) {
-      filters.name = { contains: search };
+      filters.OR = [
+        { name: { contains: search } },
+        { specialty: { contains: search } }
+      ];
     }
     if (specialty) {
       filters.specialty = { contains: specialty };
@@ -101,10 +104,10 @@ const getDoctorById = async (req, res) => {
 // POST /api/patients/appointments
 const bookAppointment = async (req, res) => {
   try {
-    const { slotId, clientTime } = req.body;
+    let { slotId, doctorId, startTime, date, clientTime } = req.body;
     
-    if (!slotId || typeof slotId !== 'number') {
-      return res.status(400).json({ message: "A valid slotId is required" });
+    if (!slotId && (!doctorId || !startTime || !date)) {
+      return res.status(400).json({ message: "slotId OR (doctorId, startTime, date) are required" });
     }
 
     const patient = await prisma.patient.findUnique({ where: { userId: req.user.id }});
@@ -112,13 +115,28 @@ const bookAppointment = async (req, res) => {
 
     // Transaction for concurrency control
     const result = await prisma.$transaction(async (tx) => {
-      const slot = await tx.slot.findUnique({ where: { id: slotId } });
+      let currentSlotId = slotId;
+
+      if (!currentSlotId && doctorId && startTime && date) {
+           const newSlot = await tx.slot.create({
+                data: {
+                     doctorId: parseInt(doctorId),
+                     date: new Date(date),
+                     startTime: new Date(startTime),
+                     endTime: new Date(new Date(startTime).getTime() + 30 * 60000),
+                     booked: false
+                }
+           });
+           currentSlotId = newSlot.id;
+      }
+
+      const slot = await tx.slot.findUnique({ where: { id: currentSlotId } });
       
       if (!slot) throw new Error("Slot not found");
       if (slot.booked) throw new Error("Slot is already booked");
       
       const currentTime = clientTime ? new Date(clientTime) : new Date();
-      if (slot.startTime < currentTime) throw new Error("Cannot book slots in the past");
+      if (slot.startTime < currentTime) throw new Error("slots cant be confirmed");
 
       // Prevent double booking for the same patient at the exact same time
       const conflictingAppointment = await tx.appointment.findFirst({
@@ -139,7 +157,7 @@ const bookAppointment = async (req, res) => {
       }
 
       const updatedSlot = await tx.slot.update({
-        where: { id: slotId },
+        where: { id: currentSlotId },
         data: { booked: true }
       });
 

@@ -9,6 +9,7 @@ const patientRoutes = require("./modules/patient/patient.routes");
 const doctorRoutes = require("./modules/doctor/doctor.routes");
 const adminRoutes = require("./modules/admin/admin.routes");
 const publicRoutes = require("./modules/public/public.routes");
+const dashboardRoutes = require("./adminportal/dashboard/dashboard.routes");
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use("/api/public", publicRoutes);
 app.use("/api/patients", patientRoutes);
 app.use("/api/doctors", doctorRoutes);
 app.use("/api/admins", adminRoutes);
+app.use("/api/adminportal/dashboard", dashboardRoutes);
 
 // Root route
 app.get("/", (req, res) => {

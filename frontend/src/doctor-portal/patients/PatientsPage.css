@@ -1,0 +1,136 @@
+.doctor-patients {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.page-header h1 { margin: 0; font-size: 28px; color: #1a1a1a; }
+.page-header p { margin: 4px 0 0; color: #757575; }
+
+.search-bar-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #ffffff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  width: 300px;
+}
+
+.search-bar-inline input {
+  border: none;
+  outline: none;
+  font-size: 14px;
+  width: 100%;
+}
+
+.patients-table-container {
+  background-color: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #f0f0f0;
+  overflow-x: auto;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+
+.patients-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.patients-table th {
+  background-color: #f9f9f9;
+  padding: 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #616161;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.patients-table td {
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+  color: #424242;
+}
+
+.patient-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar-sm {
+  background-color: #e0f2f1;
+  color: #00897b;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.contact-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #616161;
+}
+
+.count-badge {
+  background-color: #e3f2fd;
+  color: #1e88e5;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.visit-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #757575;
+  font-size: 13px;
+}
+
+.view-profile-btn {
+  background: none;
+  border: 1px solid #0099b8;
+  color: #0099b8;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-profile-btn:hover {
+  background-color: #0099b8;
+  color: #ffffff;
+}
+
+.empty-state, .loading-state {
+  text-align: center;
+  padding: 40px;
+  color: #757575;
+}

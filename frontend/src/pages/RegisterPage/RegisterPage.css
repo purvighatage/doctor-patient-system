@@ -1,0 +1,155 @@
+.register-container {
+  min-height: 100vh;
+  background-color: var(--bg-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 24px;
+}
+
+.register-header {
+  margin-bottom: 40px;
+}
+
+.register-header .logo {
+  font-size: 28px;
+}
+
+.register-header .logo-icon {
+  width: 40px;
+  height: 40px;
+}
+
+.register-header .logo-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.register-card {
+  background-color: var(--bg-surface);
+  width: 100%;
+  max-width: 520px;
+  padding: 48px;
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+}
+
+.register-card h2 {
+  font-size: 24px;
+  margin-bottom: 8px;
+  color: var(--text-dark);
+}
+
+.register-card .subtitle {
+  color: var(--text-light);
+  font-size: 15px;
+  margin-bottom: 32px;
+}
+
+.error-message {
+  background-color: #fee2e2;
+  color: #ef4444;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 20px;
+  text-align: center;
+  border: 1px solid #fecaca;
+}
+
+/* Role Toggle */
+.role-toggle {
+  display: flex;
+  background-color: var(--bg-light);
+  padding: 6px;
+  border-radius: 12px;
+  margin-bottom: 32px;
+  border: 1px solid var(--border-color);
+}
+
+.role-toggle button {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  background: transparent;
+  color: var(--text-body);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: var(--transition);
+}
+
+.role-toggle button.active {
+  background-color: var(--bg-surface);
+  color: var(--text-dark);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Forms */
+.form-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--text-dark);
+}
+
+.form-group input {
+  padding: 12px 16px;
+  border: 1px solid var(--border-color-dark);
+  border-radius: 8px;
+  font-size: 15px;
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+  transition: var(--transition);
+  outline: none;
+  font-family: inherit;
+}
+
+.form-group input::placeholder {
+  color: var(--text-light);
+  opacity: 0.7;
+}
+
+.form-group input:focus {
+  border-color: var(--primary);
+  background-color: var(--bg-surface);
+  box-shadow: 0 0 0 3px rgba(0, 156, 166, 0.1);
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  margin-top: 12px;
+  margin-bottom: 24px;
+}
+
+.login-link {
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-body);
+}
+
+.login-link a {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .register-card {
+    padding: 32px 24px;
+  }
+}

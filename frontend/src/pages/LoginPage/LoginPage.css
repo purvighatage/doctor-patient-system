@@ -1,0 +1,189 @@
+.login-container {
+  min-height: 100vh;
+  background-color: var(--bg-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 24px;
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.logo-icon-solid {
+  width: 40px;
+  height: 40px;
+  background-color: var(--primary);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-text-bold {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+
+.login-card {
+  background-color: var(--bg-surface);
+  width: 100%;
+  max-width: 460px;
+  padding: 48px 40px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+}
+
+.login-card h2 {
+  font-size: 24px;
+  margin-bottom: 8px;
+  color: var(--text-dark);
+}
+
+.login-card .subtitle {
+  color: var(--text-light);
+  font-size: 15px;
+  margin-bottom: 32px;
+}
+
+.error-message {
+  background-color: #fee2e2;
+  color: #ef4444;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 20px;
+  text-align: center;
+  border: 1px solid #fecaca;
+}
+
+/* Role Toggle */
+.role-toggle {
+  display: flex;
+  background-color: var(--bg-light);
+  padding: 6px;
+  border-radius: 12px;
+  margin-bottom: 32px;
+  border: 1px solid var(--border-color);
+}
+
+.role-toggle button {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  background: transparent;
+  color: var(--text-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: var(--transition);
+}
+
+.role-toggle button.active {
+  background-color: var(--bg-surface);
+  color: var(--text-dark);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Forms */
+
+.form-group {
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.password-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-dark);
+}
+
+.forgot-password {
+  font-size: 13px;
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+}
+
+.form-group input {
+  padding: 12px 16px;
+  border: 1px solid var(--border-color-dark);
+  border-radius: 8px;
+  font-size: 15px;
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+  transition: var(--transition);
+  outline: none;
+  font-family: inherit;
+}
+
+.form-group input:focus {
+  border-color: var(--primary);
+  background-color: var(--bg-surface);
+  box-shadow: 0 0 0 3px rgba(0, 156, 166, 0.1);
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  margin-top: 8px;
+  margin-bottom: 32px;
+}
+
+.register-link {
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-body);
+}
+
+.register-link a {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.register-link a:hover {
+  text-decoration: underline;
+}
+
+.back-to-home {
+  margin-top: 32px;
+}
+
+.back-to-home a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-light);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.back-to-home a:hover {
+  color: var(--text-dark);
+}
+
+@media (max-width: 640px) {
+  .login-card {
+    padding: 32px 24px;
+  }
+}

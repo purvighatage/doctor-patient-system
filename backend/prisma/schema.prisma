@@ -52,6 +52,9 @@ model Patient {
   email     String
   phone     String
   dob       DateTime
+  gender    String?
+
+
   user      User     @relation(fields: [userId], references: [id])
   appointments Appointment[]
 }

@@ -49,8 +49,14 @@ const createSlot = async (req, res) => {
       return res.status(400).json({ message: "Date, startTime, and endTime are required" });
     }
 
-    const start = new Date(startTime);
-    const end = new Date(endTime);
+    const [startHour, startMin] = startTime.split(':');
+    const start = new Date(date);
+    start.setHours(parseInt(startHour, 10), parseInt(startMin, 10), 0, 0);
+
+    const [endHour, endMin] = endTime.split(':');
+    const end = new Date(date);
+    end.setHours(parseInt(endHour, 10), parseInt(endMin, 10), 0, 0);
+
     const slotDate = new Date(date);
 
     if (start >= end) {
@@ -99,9 +105,9 @@ const createSlot = async (req, res) => {
     const slot = await prisma.slot.create({
       data: {
         doctorId: doctor.id,
-        date: new Date(date),
-        startTime: new Date(startTime),
-        endTime: new Date(endTime),
+        date: slotDate,
+        startTime: start,
+        endTime: end,
         booked: false
       }
     });
