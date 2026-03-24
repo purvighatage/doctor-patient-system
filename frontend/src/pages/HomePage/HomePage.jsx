@@ -3,6 +3,16 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Activity, Moon, Sun, ArrowRight, Calendar, Video, Shield, Users, Star, CheckCircle, Search } from 'lucide-react';
 import './HomePage.css';
 
+/**
+ * HomePage Component
+ * 
+ * The main landing page of the MediCare application. 
+ * Features a comprehensive overview of the platform, including:
+ * - Hero section with integrated doctor search
+ * - Key feature highlights (Easy Booking, Video Calls, etc.)
+ * - Statistics and social proof
+ * - Testimonials and call-to-action sections
+ */
 const HomePage = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -16,6 +26,10 @@ const HomePage = () => {
     }
   }, [isDarkMode]);
 
+  /**
+   * Toggles the theme between light and dark mode.
+   * Updates the 'isDarkMode' state which in turn triggers the body class effect.
+   */
   const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
   return (
     <>
@@ -58,9 +72,16 @@ const HomePage = () => {
               Connect with top healthcare professionals, manage appointments, and access your medical records - all in one secure platform.
             </p>
             
-            <form onSubmit={(e) => { e.preventDefault(); navigate(`/find?search=${searchQuery}`); }} className="hero-search-bar">
+            <form onSubmit={(e) => { 
+              e.preventDefault(); 
+              if (!searchQuery.trim()) {
+                alert('Please enter a doctor name or specialty to search.');
+                return;
+              }
+              navigate(`/find?search=${encodeURIComponent(searchQuery.trim())}`); 
+            }} className="hero-search-bar">
               <div className="search-input-wrapper">
-                <Search size={20} className="search-icon" />
+                <Search size={20} className="home-search-icon" />
                 <input 
                   type="text" 
                   placeholder="Search doctor, specialties (e.g. Cardiologist)..." 

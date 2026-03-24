@@ -54,7 +54,7 @@ const ProfilePage = () => {
 
   return (
     <div className="admin-profile-page">
-      <div className="profile-header">
+      <div className="admin-profile-header">
         <h1>Admin Profile</h1>
         <p>Manage your account details and hospital affiliations</p>
       </div>

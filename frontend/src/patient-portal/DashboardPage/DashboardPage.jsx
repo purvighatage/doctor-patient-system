@@ -8,6 +8,17 @@ import {
 
 import './DashboardPage.css';
 
+/**
+ * DashboardPage Component
+ * 
+ * The initial landing view for authenticated patients.
+ * Displays:
+ * - A personalized welcome greeting.
+ * - Key statistics (e.g., count of upcoming appointments).
+ * - A summary list of the most immediate scheduled consultations.
+ * - Health metrics tracking (Health Score, Heart Rate, Blood Pressure).
+ * - Quick action entry points (e.g., Book Appointment).
+ */
 const DashboardPage = () => {
   const [userName, setUserName] = React.useState('Patient');
   const { appointments } = useOutletContext();
@@ -47,7 +58,7 @@ const DashboardPage = () => {
             <span className="stat-title">Health Score</span>
             <span className="stat-value">85%</span>
           </div>
-          <div className="icon-wrapper pink sm">
+          <div className="icon-wrapper teal sm">
             <Heart size={20} />
           </div>
         </div>

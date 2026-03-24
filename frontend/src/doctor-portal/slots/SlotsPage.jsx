@@ -2,6 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { Calendar as CalendarIcon, Clock, Plus, Trash2, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
 import './SlotsPage.css';
 
+/**
+ * DoctorSlotsPage Component
+ * 
+ * The primary interface for managing consulting availability.
+ * Functional areas:
+ * - View existing time slots with booking status (Available vs. Booked).
+ * - Create new availability windows with date and time range selection.
+ * - Delete unbooked slots to adjust the doctor's schedule.
+ * - Real-time validation for slot overlaps on the backend.
+ */
 const DoctorSlotsPage = () => {
   const [slots, setSlots] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -54,6 +64,13 @@ const DoctorSlotsPage = () => {
     }));
   };
 
+  /**
+   * Processes the creation of a new availability slot.
+   * - Sends date, start time, and end time to the backend.
+   * - Handles overlap validation errors and success notifications.
+   * - Refreshes the local slot list upon successful creation.
+   * @param {Object} e - Submit event.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitLoading(true);
@@ -62,13 +79,6 @@ const DoctorSlotsPage = () => {
 
     try {
       const token = sessionStorage.getItem('token');
-      
-      // The API expects date, startTime, and endTime
-      // Date in 'YYYY-MM-DD'
-      // Time in 'HH:mm'
-      // To combine them properly for the backend which parses DateTime,
-      // it might be safer to send them formatted.
-      // E.g. { date: '2023-11-01', startTime: '09:00', endTime: '09:30' }
       
       const res = await fetch('/api/doctors/slots', {
         method: 'POST',

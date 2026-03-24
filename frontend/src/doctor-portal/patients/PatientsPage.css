@@ -134,3 +134,153 @@
   padding: 40px;
   color: #757575;
 }
+
+/* Records Modal */
+.records-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.4);
+  backdrop-filter: blur(2px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.records-modal-content {
+  background-color: #ffffff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 550px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.records-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.records-modal-header h2 { margin: 0; font-size: 20px; color: #1a1a1a; }
+.records-modal-header p { margin: 4px 0 0; font-size: 13px; color: #757575; }
+
+.records-modal-header .close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #757575;
+  cursor: pointer;
+}
+
+.records-modal-body {
+  padding: 24px;
+}
+
+.patient-meta-sm {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  background-color: #f9f9f9;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #424242;
+}
+
+.meta-bubble span { font-weight: 600; color: #616161; }
+
+.visits-timeline h3 {
+  font-size: 16px;
+  color: #1a1a1a;
+  margin-bottom: 16px;
+}
+
+.visits-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding-left: 12px;
+}
+
+.visit-item {
+  display: flex;
+  position: relative;
+  padding-bottom: 20px;
+}
+
+.visit-dot {
+  width: 10px;
+  height: 10px;
+  background-color: #0099b8;
+  border-radius: 50%;
+  position: absolute;
+  left: -5px;
+  top: 16px;
+  z-index: 2;
+}
+
+.visit-line {
+  position: absolute;
+  left: -1px;
+  top: 16px;
+  bottom: 0;
+  width: 2px;
+  background-color: #e0e0e0;
+  z-index: 1;
+}
+
+.visit-item:last-child .visit-line { display: none; }
+
+.visit-card {
+  flex: 1;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-left: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.visit-card-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.v-date { font-weight: 600; font-size: 14px; color: #1a1a1a; }
+
+.v-status {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: capitalize;
+}
+
+.v-status.booked, .v-status.scheduled { background-color: #e8f5e9; color: #2e7d32; }
+.v-status.cancelled { background-color: #ffebee; color: #c62828; }
+.v-status.completed { background-color: #e3f2fd; color: #1565c0; }
+
+.visit-card-body {
+  display: flex;
+  gap: 16px;
+}
+
+.v-detail {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #616161;
+}
+

@@ -482,8 +482,11 @@ svg.arrow-icon {
   padding: 0 12px;
 }
 
-.search-input-wrapper .search-icon {
+.search-input-wrapper .home-search-icon {
   color: #757575;
+  flex-shrink: 0;
+  position: static;
+  transform: none;
 }
 
 .search-input-wrapper input {
@@ -492,6 +495,7 @@ svg.arrow-icon {
   font-size: 15px;
   width: 100%;
   color: #424242;
+  min-width: 0;
 }
 
 .hero-search-bar button {

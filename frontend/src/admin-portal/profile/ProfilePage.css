@@ -4,8 +4,8 @@
   gap: 24px;
 }
 
-.profile-header h1 { margin: 0; font-size: 28px; color: #1a1a1a; }
-.profile-header p { margin: 4px 0 0; color: #757575; }
+.admin-profile-header h1 { margin: 0; font-size: 28px; color: #1a1a1a; }
+.admin-profile-header p { margin: 4px 0 0; color: #757575; }
 
 .profile-card {
   background-color: var(--bg-surface);

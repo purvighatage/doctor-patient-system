@@ -4,6 +4,16 @@ import { Activity, ArrowLeft } from 'lucide-react';
 import { loginUser } from '../../services/api';
 import './LoginPage.css';
 
+/**
+ * LoginPage Component
+ * 
+ * Provides a unified login interface for all user roles (Patient, Doctor, Admin).
+ * Handles:
+ * - Role selection for login context
+ * - Credential submission to the backend API
+ * - Session management (storing JWT tokens and user profiles)
+ * - Navigation to respective portals or password change flows
+ */
 const LoginPage = () => {
   const navigate = useNavigate();
   const [role, setRole] = useState('PATIENT');
@@ -15,6 +25,10 @@ const LoginPage = () => {
     password: ''
   });
 
+  /**
+   * Updates form data state based on user input.
+   * @param {Object} e - The input change event.
+   */
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -22,6 +36,14 @@ const LoginPage = () => {
     });
   };
 
+  /**
+   * Processes the login form submission.
+   * - Calls the login API service.
+   * - Stores authentication data in sessionStorage.
+   * - Validates that the logged-in user's role matches the selected role in the UI.
+   * - Redirects to the appropriate portal or specific flows (like password change for new doctors).
+   * @param {Object} e - The form submission event.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');

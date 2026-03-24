@@ -1,9 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Activity } from 'lucide-react';
+import { Activity, Check, Circle } from 'lucide-react';
 import { registerPatient, registerAdmin } from '../../services/api';
 import './RegisterPage.css';
 
+/**
+ * RegisterPage Component
+ * 
+ * Conducts the registration process for new users. 
+ * Supports two distinct flows:
+ * 1. Patient: Standard personal information registration.
+ * 2. Admin: Hospital/Clinic registration with administrative account creation.
+ * Features real-time password requirement tracking and role-based field conditional rendering.
+ */
 const RegisterPage = () => {
   const navigate = useNavigate();
   const [role, setRole] = useState('PATIENT'); // 'PATIENT' or 'ADMIN'
@@ -20,25 +29,68 @@ const RegisterPage = () => {
     password: '',
     confirmPassword: ''
   });
+  
+  const [passwordRequirements, setPasswordRequirements] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false,
+    symbol: false
+  });
+
+  /**
+   * Validates the password against a set of security requirements.
+   * @param {string} pass - The password string to evaluate.
+   */
+  const checkPassword = (pass) => {
+    setPasswordRequirements({
+      length: pass.length >= 8,
+      uppercase: /[A-Z]/.test(pass),
+      lowercase: /[a-z]/.test(pass),
+      number: /[0-9]/.test(pass),
+      symbol: /[^A-Za-z0-9]/.test(pass)
+    });
+  };
 
   // Keep dark mode check if needed, or rely on global class
   useEffect(() => {
     // If the dark mode state is kept globally via body class, nothing needed here
   }, []);
 
+  /**
+   * Updates state for form inputs and triggers password validation.
+   * @param {Object} e - Input change event.
+   */
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     });
+    if (name === 'password') {
+      checkPassword(value);
+    }
   };
 
+  /**
+   * Submits the registration form.
+   * - Validates password confirmation and requirements.
+   * - Constructs the appropriate payload based on user role.
+   * - Calls the registration API and redirects upon success.
+   * @param {Object} e - Form submission event.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords don't match!");
+      return;
+    }
+
+    const allMet = Object.values(passwordRequirements).every(Boolean);
+    if (!allMet) {
+      setError("Please meet all password requirements.");
       return;
     }
 
@@ -230,6 +282,35 @@ const RegisterPage = () => {
               onChange={handleChange}
               required
             />
+            
+            <div className="password-requirements">
+              <span className="password-requirements-title">Password must contain:</span>
+              <div className={`requirement-item ${passwordRequirements.length ? 'met' : ''}`}>
+                <span className="requirement-icon check"><Check size={12} strokeWidth={3} /></span>
+                <span className="requirement-icon circle"></span>
+                Minimum 8 characters
+              </div>
+              <div className={`requirement-item ${passwordRequirements.uppercase ? 'met' : ''}`}>
+                <span className="requirement-icon check"><Check size={12} strokeWidth={3} /></span>
+                <span className="requirement-icon circle"></span>
+                At least one uppercase letter
+              </div>
+              <div className={`requirement-item ${passwordRequirements.lowercase ? 'met' : ''}`}>
+                <span className="requirement-icon check"><Check size={12} strokeWidth={3} /></span>
+                <span className="requirement-icon circle"></span>
+                At least one lowercase letter
+              </div>
+              <div className={`requirement-item ${passwordRequirements.number ? 'met' : ''}`}>
+                <span className="requirement-icon check"><Check size={12} strokeWidth={3} /></span>
+                <span className="requirement-icon circle"></span>
+                At least one number
+              </div>
+              <div className={`requirement-item ${passwordRequirements.symbol ? 'met' : ''}`}>
+                <span className="requirement-icon check"><Check size={12} strokeWidth={3} /></span>
+                <span className="requirement-icon circle"></span>
+                At least one symbol (e.g. @, $, !, %)
+              </div>
+            </div>
           </div>
           <div className="form-group">
             <label>Confirm Password</label>

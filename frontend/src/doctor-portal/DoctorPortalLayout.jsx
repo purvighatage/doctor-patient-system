@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, Link, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Calendar, Users, FileText, MessageSquare, Settings, LogOut, Activity, Clock } from 'lucide-react';
+import { LayoutDashboard, Calendar, Users, FileText, MessageSquare, Settings, LogOut, Activity, Clock, User, BarChart } from 'lucide-react';
 import './DoctorPortalLayout.css';
 
 const DoctorPortalLayout = () => {
@@ -53,11 +53,21 @@ const DoctorPortalLayout = () => {
             <Users size={20} />
             <span>Patients</span>
           </NavLink>
+          <NavLink to="/doctor/analytics" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+            <BarChart size={20} />
+            <span>Analytics</span>
+          </NavLink>
+          <NavLink to="/doctor/profile" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+            <User size={20} />
+            <span>Profile</span>
+          </NavLink>
         </nav>
 
         <div className="sidebar-footer">
-          <div className="user-profile">
-            <div className="avatar">DES</div>
+          <div className="user-profile" onClick={() => navigate('/doctor/profile')} style={{ cursor: 'pointer' }}>
+            <div className="avatar">
+               {doctor.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+            </div>
             <div className="user-info">
               <h4>{doctor.name}</h4>
               <p>{doctor.role}</p>

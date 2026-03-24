@@ -14,7 +14,7 @@ model User {
   password  String
   role      Role
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now()) // <-- add @default(now())
+  updatedAt DateTime @updatedAt @default(now())
   doctor    Doctor?
   patient   Patient?
   hospital  Hospital?
@@ -26,6 +26,7 @@ enum Role {
   DOCTOR
   ADMIN
 }
+
 model Doctor {
   id           Int       @id @default(autoincrement())
   userId       Int       @unique
@@ -54,12 +55,9 @@ model Patient {
   dob       DateTime
   gender    String?
 
-
   user      User     @relation(fields: [userId], references: [id])
   appointments Appointment[]
 }
-
-
 
 model Slot {
   id           Int        @id @default(autoincrement())
@@ -70,7 +68,7 @@ model Slot {
   booked       Boolean    @default(false)
 
   doctor       Doctor     @relation(fields: [doctorId], references: [id])
-  appointments Appointment[]  // <-- add this
+  appointments Appointment[]
 
   @@unique([doctorId, date, startTime])
 }
@@ -85,7 +83,7 @@ model Appointment {
 
   patient   Patient  @relation(fields: [patientId], references: [id])
   doctor    Doctor   @relation(fields: [doctorId], references: [id])
-  slot      Slot     @relation(fields: [slotId], references: [id])
+  slot      Slot     @relation(fields: [slotId], references: [id], onDelete: Cascade)
 }
 
 enum Status {

@@ -2,10 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { User, Mail, Phone, Calendar, Search } from 'lucide-react';
 import './PatientsPage.css';
 
+/**
+ * PatientsPage Component (Doctor Portal)
+ * 
+ * Provides a specialized directory of all patients treated by the doctor.
+ * Features:
+ * - Tabular view of patient demographics and contact details.
+ * - Visit frequency tracking and "Last Visit" timestamping.
+ * - Real-time filtering by name, email, or phone.
+ * - Entry point to individual patient medical records.
+ */
 const PatientsPage = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedPatient, setSelectedPatient] = useState(null);
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -41,11 +52,18 @@ const PatientsPage = () => {
         phone: p.phone,
         visitCount: 0,
         lastVisit: null,
-        status: app.status // Latest status or overall
+        status: app.status,
+        visits: []
       };
     }
 
     patientMap[pId].visitCount += 1;
+    patientMap[pId].visits.push({
+      date: app.slot.startTime,
+      time: new Date(app.slot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      status: app.status,
+      type: 'Consultation' // Fallback
+    });
 
     const appDate = new Date(app.slot.startTime);
     if (!patientMap[pId].lastVisit || appDate > new Date(patientMap[pId].lastVisit)) {
@@ -122,12 +140,58 @@ const PatientsPage = () => {
                     </div>
                   </td>
                   <td>
-                    <button className="view-profile-btn">View Records</button>
+                    <button className="view-profile-btn" onClick={() => setSelectedPatient(p)}>View Records</button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+      {selectedPatient && (
+        <div className="records-modal-overlay">
+          <div className="records-modal-content">
+            <div className="records-modal-header">
+              <div>
+                <h2>{selectedPatient.name}'s Medical History</h2>
+                <p>Consultation log and visit timelines</p>
+              </div>
+              <button className="close-btn" onClick={() => setSelectedPatient(null)}>&times;</button>
+            </div>
+            
+            <div className="records-modal-body">
+              <div className="patient-meta-sm">
+                 <div className="meta-bubble"><span>Email:</span> {selectedPatient.email}</div>
+                 <div className="meta-bubble"><span>Phone:</span> {selectedPatient.phone}</div>
+              </div>
+
+              <div className="visits-timeline">
+                <h3>Past Visits ({selectedPatient.visitCount})</h3>
+                {selectedPatient.visits.length === 0 ? (
+                  <p className="no-visits">No previous visits recorded.</p>
+                ) : (
+                  <div className="visits-list">
+                    {selectedPatient.visits.sort((a,b) => new Date(b.date) - new Date(a.date)).map((visit, index) => (
+                      <div className="visit-item" key={index}>
+                        <div className="visit-dot"></div>
+                        <div className="visit-line"></div>
+                        <div className="visit-card">
+                          <div className="visit-card-header">
+                            <span className="v-date">{new Date(visit.date).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                            <span className={`v-status ${visit.status.toLowerCase()}`}>{visit.status}</span>
+                          </div>
+                          <div className="visit-card-body">
+                             <div className="v-detail">🕒 <span>{visit.time}</span></div>
+                             <div className="v-detail">🏥 <span>General Consultation</span></div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

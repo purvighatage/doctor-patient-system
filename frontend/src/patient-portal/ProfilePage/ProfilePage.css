@@ -5,18 +5,18 @@
   padding: 24px;
 }
 
-.profile-header {
+.patient-profile-header {
   margin-bottom: 24px;
 }
 
-.profile-header h1 {
+.patient-profile-header h1 {
   font-size: 28px;
   font-weight: 700;
   color: #0f172a;
   margin-bottom: 4px;
 }
 
-.profile-header p {
+.patient-profile-header p {
   color: #64748b;
   font-size: 15px;
 }

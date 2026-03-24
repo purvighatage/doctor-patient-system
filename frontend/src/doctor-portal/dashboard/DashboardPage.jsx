@@ -1,9 +1,21 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Calendar, Users, Clock, Star, ArrowRight } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts';
 import './DashboardPage.css';
 
+/**
+ * DashboardPage Component (Doctor Portal)
+ * 
+ * The primary landing page for authenticated doctors.
+ * Provides:
+ * - Real-time statistics (Today's Appointments, Unique Patients, Pending Actions).
+ * - A prioritized "Today's Schedule" list with direct consultation actions.
+ * - Interactive weekly activity visualization using Recharts.
+ * - Quick-link shortcuts for common tasks (Managing slots, records, etc.).
+ */
 const DashboardPage = () => {
+  const navigate = useNavigate();
   const [doctorName, setDoctorName] = useState("Doctor");
 
   useEffect(() => {
@@ -18,6 +30,10 @@ const DashboardPage = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  /**
+   * Fetches the doctor's appointment list from the backend.
+   * Implements a polling mechanism (every 30 seconds) to ensure data freshness.
+   */
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
@@ -108,7 +124,7 @@ const DashboardPage = () => {
         <div className="grid-item schedule-box">
           <div className="grid-header">
             <h3>Today's Schedule</h3>
-            <button className="view-all-btn">
+            <button className="view-all-btn" onClick={() => navigate('/doctor/appointments')}>
               <span>View all</span>
               <ArrowRight size={16} />
             </button>
@@ -165,21 +181,21 @@ const DashboardPage = () => {
 
       {/* Bottom Shortcuts (Image 2) */}
       <div className="shortcuts-grid">
-        <div className="shortcut-card">
+        <div className="shortcut-card" onClick={() => navigate('/doctor/appointments')} style={{ cursor: 'pointer' }}>
           <div className="shortcut-icon"><Calendar size={24} /></div>
           <div>
             <h4>Manage Appointments</h4>
             <p>View & update schedule</p>
           </div>
         </div>
-        <div className="shortcut-card">
+        <div className="shortcut-card" onClick={() => navigate('/doctor/patients')} style={{ cursor: 'pointer' }}>
           <div className="shortcut-icon"><Users size={24} /></div>
           <div>
             <h4>Patient Records</h4>
             <p>Access medical history</p>
           </div>
         </div>
-        <div className="shortcut-card">
+        <div className="shortcut-card" onClick={() => navigate('/doctor/slots')} style={{ cursor: 'pointer' }}>
           <div className="shortcut-icon"><Clock size={24} /></div>
           <div>
             <h4>Set Availability</h4>

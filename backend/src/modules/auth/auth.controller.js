@@ -3,13 +3,16 @@ const {
   loginUser,
   registerAdminWithHospital,
 } = require("./auth.service");
-const { validateEmail, validatePhone, validateName } = require("../../utils/validators");
+const { validateEmail, validatePhone, validateName, validatePassword } = require("../../utils/validators");
 
 const registerHospital = async (req, res) => {
   try {
     const { adminName, email, password, hospitalName, address, phone } = req.body;
     if (!validateName(adminName) || !email || !password || !validateName(hospitalName) || !address) {
       return res.status(400).json({ message: "Valid Admin name, email, password, valid hospital name, and address are required" });
+    }
+    if (!validatePassword(password)) {
+      return res.status(400).json({ message: "Password must be at least 8 characters long, contain 1 uppercase, 1 lowercase, 1 number, and 1 symbol" });
     }
     if (!validateEmail(email)) {
       return res.status(400).json({ message: "Invalid admin email format" });
@@ -29,6 +32,9 @@ const register = async (req, res) => {
     const { name, email, phone, dob, password } = req.body;
     if (!validateName(name) || !email || !phone || !dob || !password) {
       return res.status(400).json({ message: "All fields (valid name, email, phone, dob, password) are required" });
+    }
+    if (!validatePassword(password)) {
+      return res.status(400).json({ message: "Password must be at least 8 characters long, contain 1 uppercase, 1 lowercase, 1 number, and 1 symbol" });
     }
     if (!validateEmail(email)) {
       return res.status(400).json({ message: "Invalid patient email format" });

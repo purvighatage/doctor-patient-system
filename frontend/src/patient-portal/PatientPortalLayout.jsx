@@ -67,7 +67,7 @@ const PatientPortalLayout = () => {
              status: 'scheduled',
              slotId: a.slotId,
              startTime: a.slot ? a.slot.startTime : null,
-             doctorId: a.doctor ? a.doctor.id : null
+             doctorId: a.doctorId
          }));
 
          const completed = data.filter(a => a.status === 'COMPLETED').map(a => ({
@@ -80,7 +80,7 @@ const PatientPortalLayout = () => {
              status: 'completed',
              slotId: a.slotId,
              startTime: a.slot ? a.slot.startTime : null,
-             doctorId: a.doctor ? a.doctor.id : null
+             doctorId: a.doctorId
           }));
 
          const cancelled = data.filter(a => a.status === 'CANCELLED').map(a => ({
@@ -93,7 +93,7 @@ const PatientPortalLayout = () => {
              status: 'cancelled',
              slotId: a.slotId,
              startTime: a.slot ? a.slot.startTime : null,
-             doctorId: a.doctor ? a.doctor.id : null
+             doctorId: a.doctorId
           }));
 
          setAppointments({ scheduled, cancelled, completed });

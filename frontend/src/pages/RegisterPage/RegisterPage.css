@@ -148,6 +148,70 @@
   text-decoration: underline;
 }
 
+/* Password Requirements */
+.password-requirements {
+  margin-top: 8px;
+  margin-bottom: 20px;
+  padding: 12px;
+  background-color: var(--bg-light);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.password-requirements-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.requirement-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-light);
+  margin-bottom: 4px;
+  transition: var(--transition);
+}
+
+.requirement-item:last-child {
+  margin-bottom: 0;
+}
+
+.requirement-item.met {
+  color: #10b981; /* Success green */
+}
+
+.requirement-icon {
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.requirement-icon.circle {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--text-light);
+}
+
+.requirement-item.met .requirement-icon.circle {
+  display: none;
+}
+
+.requirement-item.met .requirement-icon.check {
+  display: flex;
+}
+
+.requirement-icon.check {
+  display: none;
+  color: #10b981;
+}
+
 @media (max-width: 640px) {
   .register-card {
     padding: 32px 24px;

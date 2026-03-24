@@ -110,13 +110,31 @@ const getAnalytics = async (req, res) => {
     if (!hospital) return res.status(400).json({ message: "Admin is not assigned to a hospital" });
 
     const activeDoctors = await prisma.doctor.count({ where: { active: true, hospitalId: hospital.id } });
-    const totalAppointments = await prisma.appointment.count({ where: { doctor: { hospitalId: hospital.id } } });
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    const totalAppointments = await prisma.appointment.count({ 
+      where: { 
+        createdAt: { gte: sevenDaysAgo },
+        doctor: { hospitalId: hospital.id } 
+      } 
+    });
     
-    const cancelledAppts = await prisma.appointment.count({ where: { status: "CANCELLED", doctor: { hospitalId: hospital.id } }});
+    const cancelledAppts = await prisma.appointment.count({ 
+      where: { 
+        status: "CANCELLED", 
+        createdAt: { gte: sevenDaysAgo },
+        doctor: { hospitalId: hospital.id } 
+      }
+    });
+    
     const cancellationRate = totalAppointments === 0 ? 0 : (cancelledAppts / totalAppointments) * 100;
 
     const appsWithDoctor = await prisma.appointment.findMany({
-      where: { doctor: { hospitalId: hospital.id } },
+      where: { 
+        createdAt: { gte: sevenDaysAgo },
+        doctor: { hospitalId: hospital.id } 
+      },
       include: { doctor: true }
     });
 
@@ -140,14 +158,8 @@ const getAnalytics = async (req, res) => {
     const mostBookedSpecialty = Object.entries(specialtyCounts).map(([label, value]) => ({ label, value })).sort((a,b) => b.value - a.value);
     const mostBookedDoctor = Object.entries(doctorCounts).map(([label, value]) => ({ label, value })).sort((a,b) => b.value - a.value);
 
-    // Appointments over time (last 30 days)
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-    const recentAppointments = await prisma.appointment.findMany({
-      where: { createdAt: { gte: thirtyDaysAgo }, doctor: { hospitalId: hospital.id } },
-      select: { createdAt: true }
-    });
+    // Appointments over time (last 7 days - reuse existing)
+    const recentAppointments = appsWithDoctor;
 
     const appointmentsByDate = {};
     recentAppointments.forEach(app => {

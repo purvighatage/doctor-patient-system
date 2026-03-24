@@ -5,6 +5,16 @@ import { useOutletContext, useLocation } from 'react-router-dom';
 import { Calendar, Video, MapPin, Plus } from 'lucide-react';
 import './AppointmentsPage.css';
 
+/**
+ * AppointmentsPage Component
+ * 
+ * A comprehensive management interface for patient appointments.
+ * Functional areas include:
+ * - Tabbed views for Scheduled, Cancelled, and Completed appointments.
+ * - Detailed appointment cards with doctor info, time, and consultation type (In-Person/Video).
+ * - Appointment actions: Reschedule, Cancel, and Join Call (if applicable).
+ * - A sophisticated booking modal featuring a dynamic calendar and time slot picker.
+ */
 const AppointmentsPage = () => {
   const [activeTab, setActiveTab] = useState('scheduled');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,6 +32,30 @@ const AppointmentsPage = () => {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [selectedSlotId, setSelectedSlotId] = useState('');
   const API_BASE = '/api';
+
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+  const handlePrevMonth = () => {
+    if (currentYear > todayDate.getFullYear() || (currentYear === todayDate.getFullYear() && currentMonth > todayDate.getMonth())) {
+      if (currentMonth === 0) {
+        setCurrentMonth(11);
+        setCurrentYear(currentYear - 1);
+      } else {
+        setCurrentMonth(currentMonth - 1);
+      }
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (currentMonth === 11) {
+      setCurrentMonth(0);
+      setCurrentYear(currentYear + 1);
+    } else {
+      setCurrentMonth(currentMonth + 1);
+    }
+  };
+
+  const isPrevDisabled = currentYear === todayDate.getFullYear() && currentMonth === todayDate.getMonth();
 
   useEffect(() => {
     if (!selectedDoctor) {
@@ -48,6 +82,14 @@ const AppointmentsPage = () => {
     return slotDate.getDate() === selectedDate;
   });
 
+  /**
+   * Finalizes the appointment booking process.
+   * Performs:
+   * - Mandatory field validation.
+   * - "Past time" validation for same-day bookings.
+   * - Client-side collision detection for existing appointments.
+   * - Backend API synchronization for atomic booking and slot reservation.
+   */
   const handleBook = async () => {
     if (!selectedDoctor || !selectedDate || !selectedTime || !consultationType) {
       alert("Please fill in all selection fields");
@@ -56,8 +98,7 @@ const AppointmentsPage = () => {
 
     // Validation for Past Time on Today
     const today = new Date();
-    // Dashboard calendar says March 2026
-    const isToday = selectedDate === today.getDate() && today.getMonth() === 2 && today.getFullYear() === 2026;
+    const isToday = selectedDate === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
 
     if (isToday) {
          const timeMatch = selectedTime.match(/(\d+):(\d+)\s*(AM|PM)/i);
@@ -80,7 +121,8 @@ const AppointmentsPage = () => {
     }
 
     // Double Booking Conflict Validation
-    const targetDateStr = `March ${selectedDate}, 2026`;
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const targetDateStr = `${monthNames[currentMonth]} ${selectedDate}, ${currentYear}`;
     const isConflict = appointments.scheduled && appointments.scheduled.some(app => {
          const appDateClean = app.date.includes(',') && !app.date.startsWith('March')
            ? app.date.split(',').slice(1).join(',').trim()
@@ -96,9 +138,10 @@ const AppointmentsPage = () => {
     const doc = doctors.find(d => d.id === parseInt(selectedDoctor));
     const newApp = {
       id: Date.now(),
+      doctorId: doc ? doc.id : null,
       doctor: doc ? (doc.name.startsWith('Dr.') ? doc.name : `Dr. ${doc.name}`) : 'Doctor',
       specialty: doc ? doc.specialty : 'Consultation',
-      date: `March ${selectedDate}, 2026`,
+      date: targetDateStr,
       time: selectedTime,
       type: consultationType,
       status: 'scheduled'
@@ -185,6 +228,13 @@ const AppointmentsPage = () => {
 
 
 
+  /**
+   * Cancels a scheduled appointment.
+   * - Checks for a 2-hour minimum cancellation lead time.
+   * - Performs a PUT request to the backend.
+   * - Moves the appointment from 'scheduled' to 'cancelled' list in local state.
+   * @param {number|string} id - The unique ID of the appointment to cancel.
+   */
   const handleCancel = async (id) => {
     try {
       const appointment = activeAppointments.find(app => app.id === id);
@@ -215,16 +265,28 @@ const AppointmentsPage = () => {
              cancelled: [...prev.cancelled, cancelledAppointment]
            }));
       } else {
-           alert("Failed to cancel appointment on backend");
+           const errData = await res.json().catch(() => ({}));
+           alert("Failed to cancel: " + (errData.message || "Unknown Error"));
       }
     } catch (err) {
        console.error("Cancel error:", err);
     }
   };
 
+  /**
+   * Triggers the rescheduling flow by opening the booking modal.
+   * Automatically selects the doctor associated with the existing appointment.
+   * @param {Object} appointment - The appointment object to reschedule.
+   */
   const handleReschedule = (appointment) => {
        if (appointment.doctorId) {
             setSelectedDoctor(appointment.doctorId.toString());
+       } else if (appointment.doctor) {
+            const cleanName = appointment.doctor.replace(/^Dr\.\s*/i, '').trim().toLowerCase();
+            const foundDoc = doctors.find(d => d.name.trim().toLowerCase() === cleanName);
+            if (foundDoc) {
+                 setSelectedDoctor(foundDoc.id.toString());
+            }
        }
        setIsModalOpen(true);
   };
@@ -328,7 +390,7 @@ const AppointmentsPage = () => {
 
             <div className="modal-body">
               <div className="form-group">
-                <label>Select Doctor</label>
+                <label>Select Doctor <span className="required-asterisk">*</span></label>
                 <select value={selectedDoctor} onChange={(e) => setSelectedDoctor(e.target.value)}>
                   <option value="" disabled>Choose a doctor</option>
                   {doctors.map(doctor => (
@@ -339,12 +401,12 @@ const AppointmentsPage = () => {
               </div>
 
               <div className="form-group">
-                <label>Select Date</label>
+                <label>Select Date <span className="required-asterisk">*</span></label>
                 <div className="calendar-box">
                   <div className="calendar-header">
-                    <button className="cal-nav-btn">&lt;</button>
+                    <button className="cal-nav-btn" onClick={handlePrevMonth} disabled={isPrevDisabled} style={{ opacity: isPrevDisabled ? 0.5 : 1, cursor: isPrevDisabled ? 'not-allowed' : 'pointer' }}>&lt;</button>
                     <span>{new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
-                    <button className="cal-nav-btn">&gt;</button>
+                    <button className="cal-nav-btn" onClick={handleNextMonth}>&gt;</button>
                   </div>
                   <div className="calendar-grid">
                     <div className="calendar-day">Su</div>
@@ -355,25 +417,27 @@ const AppointmentsPage = () => {
                     <div className="calendar-day">Fr</div>
                     <div className="calendar-day">Sa</div>
 
-                    {/* Array of dates from 1 to 31 */}
-                    {Array.from({ length: 31 }, (_, i) => i + 1).map((date) => (
-                      <button 
-                        key={date} 
-                        className={`calendar-date ${date === selectedDate ? 'active' : ''}`}
-                        onClick={() => setSelectedDate(date)}
-                        disabled={date < new Date().getDate()}
-                      >
-
-                        {date}
-                      </button>
-                    ))}
+                    {/* Array of dates */}
+                    {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((date) => {
+                      const isPastDate = currentYear === todayDate.getFullYear() && currentMonth === todayDate.getMonth() && date < todayDate.getDate();
+                      return (
+                        <button 
+                          key={date} 
+                          className={`calendar-date ${date === selectedDate ? 'active' : ''}`}
+                          onClick={() => setSelectedDate(date)}
+                          disabled={isPastDate}
+                        >
+                          {date}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
 
               <div className="form-row">
                 <div className="form-group half">
-                  <label>Time Slot</label>
+                  <label>Time Slot <span className="required-asterisk">*</span></label>
                   <select 
                     value={selectedSlotId || selectedTime} 
                     onChange={(e) => {
@@ -409,7 +473,7 @@ const AppointmentsPage = () => {
                   </select>
                 </div>
                 <div className="form-group half">
-                  <label>Consultation Type</label>
+                  <label>Consultation Type <span className="required-asterisk">*</span></label>
                   <select value={consultationType} onChange={(e) => setConsultationType(e.target.value)}>
                     <option value="" disabled>Select type</option>
                     <option value="In-Person">In-Person Consultation</option>

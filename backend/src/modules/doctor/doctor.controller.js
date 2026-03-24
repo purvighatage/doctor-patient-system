@@ -40,6 +40,62 @@ const updatePassword = async (req, res) => {
   }
 };
 
+// GET /api/doctors/profile
+const getProfile = async (req, res) => {
+  try {
+    const doctor = await prisma.doctor.findUnique({
+      where: { userId: req.user.id },
+      include: {
+        user: { select: { email: true, name: true } },
+        hospital: { select: { name: true } }
+      }
+    });
+    if (!doctor) return res.status(404).json({ message: "Doctor profile not found" });
+    res.json(doctor);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// PUT /api/doctors/profile
+const updateProfile = async (req, res) => {
+  try {
+    const { name, qualifications, experience, fees, clinic, gender } = req.body;
+
+    const doctor = await prisma.doctor.findUnique({ where: { userId: req.user.id } });
+    if (!doctor) return res.status(404).json({ message: "Doctor profile not found" });
+
+    // Update User model (only name)
+    if (name) {
+      await prisma.user.update({
+        where: { id: req.user.id },
+        data: { name }
+      });
+    }
+
+    // Update Doctor model
+    const updatedDoctor = await prisma.doctor.update({
+      where: { id: doctor.id },
+      data: {
+        name: name || undefined,
+        qualifications: qualifications || undefined,
+        experience: experience ? parseInt(experience) : undefined,
+        fees: fees ? parseFloat(fees) : undefined,
+        clinic: clinic || undefined,
+        gender: gender || undefined
+      },
+      include: {
+        user: { select: { email: true, name: true } },
+        hospital: { select: { name: true } }
+      }
+    });
+
+    res.json({ message: "Profile updated successfully", doctor: updatedDoctor });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 // POST /api/doctors/slots
 const createSlot = async (req, res) => {
   try {
@@ -243,11 +299,80 @@ const updateAppointmentStatus = async (req, res) => {
   }
 };
 
+// GET /api/doctors/analytics
+const getAnalytics = async (req, res) => {
+  try {
+    const doctor = await prisma.doctor.findUnique({ where: { userId: req.user.id } });
+    if (!doctor) return res.status(404).json({ message: "Doctor profile not found" });
+
+    // 1. Basic Metrics
+    const totalAppointments = await prisma.appointment.count({ where: { doctorId: doctor.id } });
+    const uniquePatientsResult = await prisma.appointment.groupBy({
+      by: ['patientId'],
+      where: { doctorId: doctor.id },
+      _count: { patientId: true }
+    });
+    const totalPatients = uniquePatientsResult.length;
+
+    const cancelledAppts = await prisma.appointment.count({ 
+      where: { doctorId: doctor.id, status: 'CANCELLED' } 
+    });
+    const cancellationRate = totalAppointments > 0 ? ((cancelledAppts / totalAppointments) * 100).toFixed(1) + '%' : '0%';
+
+    // 2. Appointments Over Time (Last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const appointmentsOverTimeRaw = await prisma.appointment.findMany({
+      where: {
+        doctorId: doctor.id,
+        createdAt: { gte: thirtyDaysAgo }
+      },
+      select: { createdAt: true }
+    });
+
+    const appointmentsOverTime = {};
+    appointmentsOverTimeRaw.forEach(app => {
+      const date = app.createdAt.toISOString().split('T')[0];
+      appointmentsOverTime[date] = (appointmentsOverTime[date] || 0) + 1;
+    });
+
+    // 3. Appointment Status Distribution
+    const statusDistributionRaw = await prisma.appointment.groupBy({
+      by: ['status'],
+      where: { doctorId: doctor.id },
+      _count: { id: true }
+    });
+    const statusDistribution = statusDistributionRaw.map(item => ({
+      label: item.status,
+      value: item._count.id
+    }));
+
+    res.json({
+      metrics: {
+        totalAppointments,
+        totalPatients,
+        cancellationRate,
+        completedAppointments: await prisma.appointment.count({ where: { doctorId: doctor.id, status: 'COMPLETED' } })
+      },
+      visuals: {
+        appointmentsOverTime,
+        statusDistribution
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 module.exports = {
   updatePassword,
   createSlot,
   getSlots,
   deleteSlot,
   getAppointments,
-  updateAppointmentStatus
+  updateAppointmentStatus,
+  getProfile,
+  updateProfile,
+  getAnalytics
 };

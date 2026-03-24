@@ -8,6 +8,7 @@ import DashboardPage from './patient-portal/DashboardPage/DashboardPage';
 import AppointmentsPage from './patient-portal/AppointmentsPage/AppointmentsPage';
 import ProfilePage from './patient-portal/ProfilePage/ProfilePage';
 import PatientDoctorsPage from './patient-portal/DoctorsPage/DoctorsPage';
+import DoctorDetailPage from './patient-portal/DoctorsPage/DoctorDetailPage';
 
 
 // Admin Portal Imports
@@ -26,6 +27,8 @@ import ChangePasswordPage from './doctor-portal/change-password/ChangePasswordPa
 import DoctorAppointmentsPage from './doctor-portal/appointments/AppointmentsPage';
 import DoctorPatientsPage from './doctor-portal/patients/PatientsPage';
 import DoctorSlotsPage from './doctor-portal/slots/SlotsPage';
+import DoctorProfilePage from './doctor-portal/profile/ProfilePage';
+import DoctorAnalyticsPage from './doctor-portal/analytics/AnalyticsPage';
 
 const ProtectedRoute = ({ children, allowedRole }) => {
   const userStr = sessionStorage.getItem('user');
@@ -52,12 +55,14 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/find" element={<FindDoctorsPage />} />
+        <Route path="/doctors/:id" element={<DoctorDetailPage />} />
         
         {/* Patient Portal */}
         <Route path="/patient" element={<ProtectedRoute allowedRole="PATIENT"><PatientPortalLayout /></ProtectedRoute>}>
           <Route index element={<DashboardPage />} />
           <Route path="appointments" element={<AppointmentsPage />} />
           <Route path="doctors" element={<PatientDoctorsPage />} />
+          <Route path="doctors/:id" element={<DoctorDetailPage />} />
           <Route path="profile" element={<ProfilePage />} />
 
         </Route>
@@ -82,6 +87,8 @@ function App() {
           <Route path="appointments" element={<DoctorAppointmentsPage />} />
           <Route path="patients" element={<DoctorPatientsPage />} />
           <Route path="slots" element={<DoctorSlotsPage />} />
+          <Route path="analytics" element={<DoctorAnalyticsPage />} />
+          <Route path="profile" element={<DoctorProfilePage />} />
         </Route>
 
       </Routes>

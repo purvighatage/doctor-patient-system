@@ -2,6 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, User, CheckCircle, XCircle } from 'lucide-react';
 import './AppointmentsPage.css';
 
+/**
+ * AppointmentsPage Component (Doctor Portal)
+ * 
+ * A specialized management tool for doctors to track and process patient visits.
+ * Includes:
+ * - Tabbed filtering for Upcoming, Past/Completed, and Historical appointments.
+ * - Detailed patient contact information (Email, Phone) within cards.
+ * - Direct actions for appointment lifecycle management (Finalizing/Cancelling visits).
+ * - Real-time status synchronization with the persistent database.
+ */
 const AppointmentsPage = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,6 +21,9 @@ const AppointmentsPage = () => {
     fetchAppointments();
   }, []);
 
+  /**
+   * Retrieves the comprehensive list of all appointments associated with the doctor.
+   */
   const fetchAppointments = async () => {
     setLoading(true);
     try {
@@ -29,6 +42,12 @@ const AppointmentsPage = () => {
     }
   };
 
+  /**
+   * Updates the workflow status of a specific appointment.
+   * Useful for marking consultations as "COMPLETED" or "CANCELLED" as they occur.
+   * @param {number|string} id - The unique ID of the appointment.
+   * @param {string} newStatus - The target status (e.g., 'COMPLETED').
+   */
   const updateStatus = async (id, newStatus) => {
     try {
       const token = sessionStorage.getItem('token');

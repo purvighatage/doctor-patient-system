@@ -2,6 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { User, Mail, Phone, Calendar, Heart } from 'lucide-react';
 import './ProfilePage.css';
 
+/**
+ * ProfilePage Component (Patient Portal)
+ * 
+ * Manages the user's personal identity and contact information.
+ * Supports:
+ * - Dynamic data fetching from sessionStorage on initialization.
+ * - Context-aware editing toggle (Read-only vs. Edit mode).
+ * - Real-time field validation for name, phone, email, and DOB.
+ * - Synchronization of updated profile data with persistent storage.
+ */
 const ProfilePage = () => {
   const [profileData, setProfileData] = useState({
     name: 'John Doe',
@@ -28,11 +38,21 @@ const ProfilePage = () => {
     }
   }, []);
 
+  /**
+   * Generic handler for profile form input changes.
+   * @param {Object} e - Input change event.
+   */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setProfileData(prev => ({ ...prev, [name]: value }));
   };
 
+  /**
+   * Submits the profile updates.
+   * - Disables edit mode.
+   * - Persists the new data into sessionStorage for global state consistency.
+   * @param {Object} e - Form submission event.
+   */
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsEditing(false);
@@ -45,7 +65,7 @@ const ProfilePage = () => {
 
   return (
     <div className="profile-page">
-      <div className="profile-header">
+      <div className="patient-profile-header">
         <h1>Personal Profile</h1>
         <p>Manage your account details and medical information</p>
       </div>

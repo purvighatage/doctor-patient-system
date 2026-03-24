@@ -14,4 +14,10 @@ const validateName = (name) => {
   return name.trim().length > 0;
 };
 
-module.exports = { validateEmail, validatePhone, validateName };
+const validatePassword = (password) => {
+  // Min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 symbol
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+  return passwordRegex.test(password);
+};
+
+module.exports = { validateEmail, validatePhone, validateName, validatePassword };

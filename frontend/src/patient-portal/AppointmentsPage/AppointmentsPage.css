@@ -304,6 +304,11 @@
   color: #1e293b;
 }
 
+.required-asterisk {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
 .form-group select, .form-group textarea {
   padding: 10px 12px;
   border-radius: 8px;

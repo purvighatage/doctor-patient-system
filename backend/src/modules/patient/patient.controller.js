@@ -130,10 +130,16 @@ const bookAppointment = async (req, res) => {
            currentSlotId = newSlot.id;
       }
 
+      const updateResult = await tx.slot.updateMany({
+        where: { id: currentSlotId, booked: false },
+        data: { booked: true }
+      });
+
+      if (updateResult.count === 0) {
+        throw new Error("Slot is already booked or no longer available");
+      }
+
       const slot = await tx.slot.findUnique({ where: { id: currentSlotId } });
-      
-      if (!slot) throw new Error("Slot not found");
-      if (slot.booked) throw new Error("Slot is already booked");
       
       const currentTime = clientTime ? new Date(clientTime) : new Date();
       if (slot.startTime < currentTime) throw new Error("slots cant be confirmed");
@@ -156,11 +162,6 @@ const bookAppointment = async (req, res) => {
          throw new Error("You already have an appointment booked during this time");
       }
 
-      const updatedSlot = await tx.slot.update({
-        where: { id: currentSlotId },
-        data: { booked: true }
-      });
-
       const appointment = await tx.appointment.create({
         data: {
           patientId: patient.id,
@@ -170,7 +171,7 @@ const bookAppointment = async (req, res) => {
         }
       });
 
-      return { appointment, updatedSlot };
+      return { appointment, slot };
     });
 
     // Fetch the doctor to get their name for the email
@@ -180,13 +181,15 @@ const bookAppointment = async (req, res) => {
     });
 
     // Send the email in the background (DO NOT await inside response flow unless critical)
-    sendBookingConfirmation(
-      patient.email,
-      patient.name,
-      doctor.name,
-      result.updatedSlot.date,
-      result.updatedSlot.startTime
-    ).catch(console.error);
+    if (doctor) {
+      sendBookingConfirmation(
+        patient.email,
+        patient.name,
+        doctor.name,
+        result.slot.date,
+        result.slot.startTime
+      ).catch(console.error);
+    }
 
     res.status(201).json({ message: "Appointment booked successfully", appointment: result.appointment });
   } catch (err) {
