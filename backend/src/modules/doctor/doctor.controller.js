@@ -60,7 +60,7 @@ const getProfile = async (req, res) => {
 // PUT /api/doctors/profile
 const updateProfile = async (req, res) => {
   try {
-    const { name, qualifications, experience, fees, clinic, gender } = req.body;
+    const { name, qualifications, experience, fees, clinic, gender, photo } = req.body;
 
     const doctor = await prisma.doctor.findUnique({ where: { userId: req.user.id } });
     if (!doctor) return res.status(404).json({ message: "Doctor profile not found" });
@@ -82,7 +82,8 @@ const updateProfile = async (req, res) => {
         experience: experience ? parseInt(experience) : undefined,
         fees: fees ? parseFloat(fees) : undefined,
         clinic: clinic || undefined,
-        gender: gender || undefined
+        gender: gender || undefined,
+        photo: photo !== undefined ? photo : undefined
       },
       include: {
         user: { select: { email: true, name: true } },

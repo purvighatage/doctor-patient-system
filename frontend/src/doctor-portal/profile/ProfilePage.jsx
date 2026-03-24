@@ -37,7 +37,8 @@ const ProfilePage = () => {
           experience: data.experience || '',
           fees: data.fees || '',
           clinic: data.clinic || '',
-          gender: data.gender || ''
+          gender: data.gender || '',
+          photo: data.photo || ''
         });
       } else {
         setError("Failed to load profile data");
@@ -121,7 +122,11 @@ const ProfilePage = () => {
           <div className="profile-cover"></div>
           <div className="profile-info-main">
             <div className="profile-avatar-large">
-               {formData.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'DR'}
+               {profile?.photo ? (
+                 <img src={profile.photo} alt={formData.name} className="avatar-img" />
+               ) : (
+                 formData.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'DR'
+               )}
             </div>
             <div className="profile-name-section">
               {isEditing ? (
@@ -187,6 +192,24 @@ const ProfilePage = () => {
                       </select>
                     ) : (
                       <span>{profile.gender || "Not specified"}</span>
+                    )}
+                  </div>
+                </div>
+                <div className="info-item">
+                  <div className="info-icon"><User size={18} /></div>
+                  <div className="info-text">
+                    <label>Photo URL</label>
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        name="photo"
+                        value={formData.photo}
+                        onChange={handleChange}
+                        className="edit-input"
+                        placeholder="https://example.com/photo.jpg"
+                      />
+                    ) : (
+                      <span className="photo-url-span">{profile.photo || "No photo uploaded"}</span>
                     )}
                   </div>
                 </div>

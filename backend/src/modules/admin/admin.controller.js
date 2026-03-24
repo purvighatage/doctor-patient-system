@@ -110,12 +110,12 @@ const getAnalytics = async (req, res) => {
     if (!hospital) return res.status(400).json({ message: "Admin is not assigned to a hospital" });
 
     const activeDoctors = await prisma.doctor.count({ where: { active: true, hospitalId: hospital.id } });
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
     const totalAppointments = await prisma.appointment.count({ 
       where: { 
-        createdAt: { gte: sevenDaysAgo },
+        createdAt: { gte: thirtyDaysAgo },
         doctor: { hospitalId: hospital.id } 
       } 
     });
@@ -123,7 +123,7 @@ const getAnalytics = async (req, res) => {
     const cancelledAppts = await prisma.appointment.count({ 
       where: { 
         status: "CANCELLED", 
-        createdAt: { gte: sevenDaysAgo },
+        createdAt: { gte: thirtyDaysAgo },
         doctor: { hospitalId: hospital.id } 
       }
     });
@@ -132,7 +132,7 @@ const getAnalytics = async (req, res) => {
 
     const appsWithDoctor = await prisma.appointment.findMany({
       where: { 
-        createdAt: { gte: sevenDaysAgo },
+        createdAt: { gte: thirtyDaysAgo },
         doctor: { hospitalId: hospital.id } 
       },
       include: { doctor: true }

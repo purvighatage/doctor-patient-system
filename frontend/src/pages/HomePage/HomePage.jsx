@@ -42,7 +42,7 @@ const HomePage = () => {
             </div>
             <span className="logo-text">MediCare</span>
           </div>
-          
+
           <nav className="nav-links">
             <Link to="/find" className="nav-link">Find Doctors</Link>
             <button className="icon-btn dark-mode-toggle" aria-label="Toggle Dark Mode" onClick={toggleDarkMode}>
@@ -62,29 +62,29 @@ const HomePage = () => {
             <div className="badge">
               <span className="badge-text">Trusted by 50,000+ patients</span>
             </div>
-            
+
             <h1 className="hero-title">
               Your Health,<br />
               <span className="highlight">Our Priority</span>
             </h1>
-            
+
             <p className="hero-subtitle">
               Connect with top healthcare professionals, manage appointments, and access your medical records - all in one secure platform.
             </p>
-            
-            <form onSubmit={(e) => { 
-              e.preventDefault(); 
+
+            <form onSubmit={(e) => {
+              e.preventDefault();
               if (!searchQuery.trim()) {
                 alert('Please enter a doctor name or specialty to search.');
                 return;
               }
-              navigate(`/find?search=${encodeURIComponent(searchQuery.trim())}`); 
+              navigate(`/find?search=${encodeURIComponent(searchQuery.trim())}`);
             }} className="hero-search-bar">
               <div className="search-input-wrapper">
                 <Search size={20} className="home-search-icon" />
-                <input 
-                  type="text" 
-                  placeholder="Search doctor, specialties (e.g. Cardiologist)..." 
+                <input
+                  type="text"
+                  placeholder="Search doctor, specialties (e.g. Cardiologist)..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -94,7 +94,7 @@ const HomePage = () => {
 
             <div className="hero-cta">
               <Link to="/login" className="btn btn-primary btn-lg">
-                Book Appointment 
+                Book Appointment
                 <ArrowRight size={16} className="arrow-icon" />
               </Link>
               <Link to="/find" className="btn btn-secondary btn-lg">Find Doctors</Link>
@@ -165,7 +165,7 @@ const HomePage = () => {
             <h2>Why Choose MediCare?</h2>
             <p>Everything you need for comprehensive healthcare management</p>
           </div>
-          
+
           <div className="benefits-grid">
             <div className="benefit-card">
               <div className="icon-wrapper blue">
@@ -206,7 +206,7 @@ const HomePage = () => {
             <h2>What Our Patients Say</h2>
             <p>Trusted by thousands of satisfied patients</p>
           </div>
-          
+
           <div className="testimonials-grid">
             {/* Testimonial 1 */}
             <div className="testimonial-card">
@@ -260,7 +260,7 @@ const HomePage = () => {
           <p>Join thousands of patients managing their health with MediCare</p>
           <div className="cta-actions">
             <Link to="/register" className="btn btn-outline-light">
-              Create Account 
+              Create Account
               <ArrowRight size={16} className="arrow-icon" style={{ marginLeft: 8 }} />
             </Link>
           </div>
@@ -280,13 +280,13 @@ const HomePage = () => {
               </div>
               <p className="footer-desc">Your trusted healthcare management platform</p>
             </div>
-            
+
             <div className="footer-links">
               <h4>Product</h4>
               <ul>
-                <li><a href="#find">Find Doctors</a></li>
+                <li><Link to="/find">Find Doctors</Link></li>
                 <li><Link to="/login">Book Appointment</Link></li>
-                <li><a href="#portal">Patient Portal</a></li>
+                <li><Link to="/login">Patient Portal</Link></li>
               </ul>
             </div>
 
@@ -308,7 +308,7 @@ const HomePage = () => {
               </ul>
             </div>
           </div>
-          
+
           <div className="footer-bottom">
             <p>&copy; 2026 MediCare. All rights reserved.</p>
           </div>

@@ -43,10 +43,10 @@ function AnalyticsPage() {
 
   const { metrics, visuals } = data;
 
-  // Generate last 7 days with zero fill for missing dates
+  // Generate last 30 days with zero fill for missing dates
   const appointmentsOverTimeData = [];
   const today = new Date();
-  for (let i = 6; i >= 0; i--) {
+  for (let i = 29; i >= 0; i--) {
       const d = new Date();
       d.setDate(today.getDate() - i);
       const dateKey = d.toISOString().split('T')[0];
@@ -105,7 +105,7 @@ function AnalyticsPage() {
         {/* Appointments Over Time */}
         <div className="chart-wrapper full-width">
           <div className="chart-header">
-            <h4>Appointments Trend (Last 7 Days)</h4>
+            <h4>Appointments Trend (Last 30 Days)</h4>
           </div>
           <div className="chart-body">
             {appointmentsOverTimeData.length > 0 ? (
@@ -155,26 +155,34 @@ function AnalyticsPage() {
           </div>
           <div className="chart-body">
             {visuals?.mostBookedSpecialty?.length > 0 ? (
-                 <PieChart width={300} height={260}>
-                   <Pie
-                     data={visuals.mostBookedSpecialty}
-                     dataKey="value"
-                     nameKey="label"
-                     cx="50%" cy="50%"
-                     innerRadius={60}
-                     outerRadius={80}
-                     paddingAngle={5}
-                     stroke="none"
-                   >
-                     {visuals.mostBookedSpecialty.map((entry, index) => (
-                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                     ))}
-                   </Pie>
-                   <Tooltip 
+                  <BarChart data={visuals.mostBookedSpecialty} width={300} height={260} margin={{ top: 20, right: 30, left: 10, bottom: 5 }}>
+                    <defs>
+                      <linearGradient id="specGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#a855f7" />
+                        <stop offset="100%" stopColor="#7c3aed" />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                    <XAxis 
+                      dataKey="label" 
+                      fontSize={10} 
+                      tick={{ fill: '#94a3b8' }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis 
+                      allowDecimals={false} 
+                      fontSize={12} 
+                      tick={{ fill: '#94a3b8' }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <Tooltip 
+                      cursor={{ fill: 'rgba(241, 245, 249, 0.5)' }}
                       contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                   />
-                   <Legend verticalAlign="bottom" height={36} iconType="circle" />
-                 </PieChart>
+                    />
+                    <Bar dataKey="value" name="Appointments" fill="url(#specGradient)" radius={[6, 6, 0, 0]} barSize={40} />
+                  </BarChart>
             ) : <div className="no-data">No data available</div>}
           </div>
         </div>

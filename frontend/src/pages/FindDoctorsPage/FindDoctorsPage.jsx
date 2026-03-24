@@ -28,6 +28,7 @@ const FindDoctorsPage = () => {
   const [genderFilter, setGenderFilter] = useState('All');
   const [feeRange, setFeeRange] = useState({ min: '', max: '' });
   const [dateFilter, setDateFilter] = useState('');
+  const [timeFilter, setTimeFilter] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);
 
 
@@ -42,7 +43,7 @@ const FindDoctorsPage = () => {
 
   useEffect(() => {
     fetchDoctors();
-  }, [searchTerm, specialtyFilter, genderFilter, feeRange, dateFilter]);
+  }, [searchTerm, specialtyFilter, genderFilter, feeRange, dateFilter, timeFilter]);
 
   /**
    * Fetches the list of doctors from the backend based on current filters.
@@ -58,6 +59,10 @@ const FindDoctorsPage = () => {
       if (feeRange.min) params.append('minFee', feeRange.min);
       if (feeRange.max) params.append('maxFee', feeRange.max);
       if (dateFilter) params.append('date', dateFilter);
+      if (dateFilter && timeFilter) {
+          const fullDateTime = `${dateFilter}T${timeFilter}:00`;
+          params.append('startTime', fullDateTime);
+      }
 
       const res = await fetch(`/api/patients/doctors?${params.toString()}`);
       if (!res.ok) throw new Error('Failed to fetch doctors');
@@ -107,6 +112,7 @@ const FindDoctorsPage = () => {
     setGenderFilter('All');
     setFeeRange({ min: '', max: '' });
     setDateFilter('');
+    setTimeFilter('');
   };
 
   return (
@@ -170,6 +176,10 @@ const FindDoctorsPage = () => {
                <div className="filter-field">
                   <label>Date</label>
                   <input type="date" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)} />
+               </div>
+               <div className="filter-field">
+                  <label>Time</label>
+                  <input type="time" value={timeFilter} onChange={(e) => setTimeFilter(e.target.value)} />
                </div>
                <div className="filter-field">
                   <label>Consultation Fee</label>

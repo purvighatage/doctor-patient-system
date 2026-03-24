@@ -24,11 +24,12 @@ const DoctorsPage = () => {
     const [genderFilter, setGenderFilter] = useState('All');
     const [feeRange, setFeeRange] = useState({ min: '', max: '' });
     const [dateFilter, setDateFilter] = useState('');
+    const [timeFilter, setTimeFilter] = useState('');
     const [showAdvanced, setShowAdvanced] = useState(false);
 
     useEffect(() => {
         fetchDoctors();
-    }, [searchTerm, specialtyFilter, genderFilter, feeRange, dateFilter]);
+    }, [searchTerm, specialtyFilter, genderFilter, feeRange, dateFilter, timeFilter]);
 
     /**
      * Fetches doctor data from the API based on current search and filter states.
@@ -44,6 +45,11 @@ const DoctorsPage = () => {
             if (feeRange.min) params.append('minFee', feeRange.min);
             if (feeRange.max) params.append('maxFee', feeRange.max);
             if (dateFilter) params.append('date', dateFilter);
+            if (dateFilter && timeFilter) {
+                // Combine date and time into ISO
+                const fullDateTime = `${dateFilter}T${timeFilter}:00`;
+                params.append('startTime', fullDateTime);
+            }
 
             const response = await fetch(`/api/patients/doctors?${params.toString()}`);
             if (response.ok) {
@@ -81,6 +87,7 @@ const DoctorsPage = () => {
         setGenderFilter('All');
         setFeeRange({ min: '', max: '' });
         setDateFilter('');
+        setTimeFilter('');
     };
 
     return (
@@ -133,6 +140,14 @@ const DoctorsPage = () => {
                                 value={dateFilter} 
                                 min={new Date().toISOString().split('T')[0]}
                                 onChange={(e) => setDateFilter(e.target.value)} 
+                            />
+                        </div>
+                        <div className="adv-field">
+                            <label>Preferred Time</label>
+                            <input 
+                                type="time" 
+                                value={timeFilter} 
+                                onChange={(e) => setTimeFilter(e.target.value)} 
                             />
                         </div>
                         <div className="adv-field">
