@@ -1,22 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, Link, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Calendar, Users, FileText, MessageSquare, Settings, LogOut, Activity, Clock, User, BarChart } from 'lucide-react';
+import { LayoutDashboard, Calendar, Users, FileText, MessageSquare, Settings, LogOut, Activity, Clock, User, BarChart, Sun, Moon } from 'lucide-react';
 import './DoctorPortalLayout.css';
 
 const DoctorPortalLayout = () => {
   const navigate = useNavigate();
   const [doctor, setDoctor] = useState({ name: "Doctor", role: "Specialist" });
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [userInitials, setUserInitials] = useState('D');
 
   useEffect(() => {
     const userStr = sessionStorage.getItem('user');
     if (userStr) {
       const user = JSON.parse(userStr);
+      const docName = user.name.startsWith('Dr.') ? user.name : `Dr. ${user.name}`;
       setDoctor({
-         name: user.name.startsWith('Dr.') ? user.name : `Dr. ${user.name}`,
+         name: docName,
          role: user.specialty || "Specialist"
       });
+      const initials = docName.replace('Dr. ', '').split(' ').map(n => n[0]).join('').toUpperCase();
+      setUserInitials(initials);
     }
   }, []);
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.body.classList.add('dark');
+    } else {
+      document.body.classList.remove('dark');
+    }
+  }, [isDarkMode]);
+
+  const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
   const handleLogout = () => {
     sessionStorage.clear();
@@ -79,15 +95,23 @@ const DoctorPortalLayout = () => {
         </div>
       </aside>
 
-      {/* Main Content Area */}
       <main className="main-content">
-        <header className="top-bar">
-          <div className="search-bar">
-            {/* Can leave empty or place a search mockup */}
-          </div>
-          <div className="top-actions">
-            <button className="action-icon">🔔</button>
-            <button className="action-icon">🌙</button>
+        <header className="portal-topbar">
+          <div className="topbar-right">
+            <button className="icon-btn dark-mode-toggle" aria-label="Toggle Dark Mode" onClick={toggleDarkMode}>
+              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+            <div className="avatar-wrapper">
+              <div className="avatar topbar-avatar" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
+                {userInitials}
+              </div>
+              {isDropdownOpen && (
+                <div className="avatar-dropdown">
+                  <Link to="/doctor/profile" className="dropdown-item" onClick={() => setIsDropdownOpen(false)}>Profile</Link>
+                  <button className="dropdown-item logout-btn" onClick={handleLogout}>Sign out</button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 
