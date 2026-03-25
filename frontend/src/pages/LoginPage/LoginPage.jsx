@@ -4,31 +4,19 @@ import { Activity, ArrowLeft } from 'lucide-react';
 import { loginUser } from '../../services/api';
 import './LoginPage.css';
 
-/**
- * LoginPage Component
- * 
- * Provides a unified login interface for all user roles (Patient, Doctor, Admin).
- * Handles:
- * - Role selection for login context
- * - Credential submission to the backend API
- * - Session management (storing JWT tokens and user profiles)
- * - Navigation to respective portals or password change flows
- */
+
 const LoginPage = () => {
   const navigate = useNavigate();
   const [role, setRole] = useState('PATIENT');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
 
-  /**
-   * Updates form data state based on user input.
-   * @param {Object} e - The input change event.
-   */
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -36,32 +24,25 @@ const LoginPage = () => {
     });
   };
 
-  /**
-   * Processes the login form submission.
-   * - Calls the login API service.
-   * - Stores authentication data in sessionStorage.
-   * - Validates that the logged-in user's role matches the selected role in the UI.
-   * - Redirects to the appropriate portal or specific flows (like password change for new doctors).
-   * @param {Object} e - The form submission event.
-   */
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    
+
     try {
       const data = await loginUser(formData.email, formData.password);
-      
+
       // Store token and user data
       sessionStorage.setItem('token', data.token);
       sessionStorage.setItem('user', JSON.stringify(data.user));
-      
+
       // Verification check against selected form role
       const userRole = data.user.role;
       if (userRole !== role) {
-         setError(`This account is registered as ${userRole}. Please use valid credentials or switch tabs.`);
-         setLoading(false);
-         return;
+        setError(`This account is registered as ${userRole}. Please use valid credentials or switch tabs.`);
+        setLoading(false);
+        return;
       }
 
       alert('Logged in successfully!');
@@ -69,12 +50,12 @@ const LoginPage = () => {
         navigate('/patient');
       } else if (userRole === 'DOCTOR') {
         if (data.user.mustChangePassword) {
-           navigate('/doctor/change-password');
+          navigate('/doctor/change-password');
         } else {
-           navigate('/doctor'); 
+          navigate('/doctor');
         }
       } else if (userRole === 'ADMIN') {
-        navigate('/admin'); 
+        navigate('/admin');
       }
 
     } catch (err) {

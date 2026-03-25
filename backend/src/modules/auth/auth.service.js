@@ -44,6 +44,7 @@ const registerPatient = async (data) => {
 const loginUser = async (email, password) => {
   const user = await prisma.user.findUnique({
     where: { email },
+    include: { doctor: true, patient: true }
   });
 
   if (!user) throw new Error("User not found");

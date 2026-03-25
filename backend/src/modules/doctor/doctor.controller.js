@@ -366,6 +366,33 @@ const getAnalytics = async (req, res) => {
   }
 };
 
+// POST /api/doctors/profile/upload
+const uploadPhoto = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const doctor = await prisma.doctor.findUnique({ where: { userId: req.user.id } });
+    if (!doctor) return res.status(404).json({ message: "Doctor profile not found" });
+
+    const photoUrl = `/uploads/${req.file.filename}`;
+
+    const updatedDoctor = await prisma.doctor.update({
+      where: { id: doctor.id },
+      data: { photo: photoUrl },
+      include: {
+        user: { select: { email: true, name: true } },
+        hospital: { select: { name: true } }
+      }
+    });
+
+    res.json({ message: "Photo uploaded successfully", doctor: updatedDoctor, photoUrl });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 module.exports = {
   updatePassword,
   createSlot,
@@ -375,5 +402,6 @@ module.exports = {
   updateAppointmentStatus,
   getProfile,
   updateProfile,
-  getAnalytics
+  getAnalytics,
+  uploadPhoto
 };

@@ -1,6 +1,7 @@
 const express = require("express");
 const { authenticate, authorize } = require("../../middleware/auth.middleware");
-const { updatePassword, createSlot, getSlots, deleteSlot, getAppointments, updateAppointmentStatus, getProfile, updateProfile, getAnalytics } = require("./doctor.controller");
+const upload = require("../../middleware/upload.middleware");
+const { updatePassword, createSlot, getSlots, deleteSlot, getAppointments, updateAppointmentStatus, getProfile, updateProfile, getAnalytics, uploadPhoto } = require("./doctor.controller");
 
 const router = express.Router();
 
@@ -9,6 +10,7 @@ router.use(authorize("DOCTOR"));
 
 router.get("/profile", getProfile);
 router.put("/profile", updateProfile);
+router.post("/profile/upload", upload.single("photo"), uploadPhoto);
 router.put("/password", updatePassword);
 router.post("/slots", createSlot);
 router.get("/slots", getSlots);

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { User, Mail, Award, Briefcase, DollarSign, MapPin, Building, Globe, Edit, Save, X, CheckCircle } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { User, Mail, Award, Briefcase, DollarSign, MapPin, Building, Globe, Edit, Save, X, CheckCircle, Camera, Loader } from 'lucide-react';
 import './ProfilePage.css';
 
 /**
@@ -20,6 +20,10 @@ const ProfilePage = () => {
   const [formData, setFormData] = useState({});
   const [saving, setSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const fileInputRef = useRef(null);
 
   const fetchProfile = async () => {
     try {
@@ -58,6 +62,69 @@ const ProfilePage = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setError("File size should be less than 5MB");
+        return;
+      }
+      setSelectedFile(file);
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    }
+  };
+
+  const cancelUpload = () => {
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile) return;
+    setUploading(true);
+    setError(null);
+    try {
+      const token = sessionStorage.getItem('token');
+      const formDataUpload = new FormData();
+      formDataUpload.append('photo', selectedFile);
+
+      const res = await fetch('/api/doctors/profile/upload', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formDataUpload
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setProfile({ ...profile, photo: data.photoUrl });
+        setFormData({ ...formData, photo: data.photoUrl });
+        
+        // Update sessionStorage
+        const userStr = sessionStorage.getItem('user');
+        if (userStr) {
+          const user = JSON.parse(userStr);
+          if (user.doctor) user.doctor.photo = data.photoUrl;
+          if (user.patient) user.patient.photo = data.photoUrl; // if applicable
+          sessionStorage.setItem('user', JSON.stringify(user));
+        }
+
+        setSuccessMsg('Profile photo updated!');
+        setSelectedFile(null);
+        setPreviewUrl(null);
+        setTimeout(() => setSuccessMsg(''), 3000);
+      } else {
+        const data = await res.json();
+        setError(data.message || "Failed to upload photo");
+      }
+    } catch (err) {
+      setError("Error uploading photo");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -86,6 +153,13 @@ const ProfilePage = () => {
         if (userStr) {
           const user = JSON.parse(userStr);
           user.name = formData.name;
+          if (user.doctor) {
+            user.doctor.name = formData.name;
+            user.doctor.photo = formData.photo;
+          }
+          if (user.patient) {
+            user.patient.name = formData.name;
+          }
           sessionStorage.setItem('user', JSON.stringify(user));
         }
 
@@ -121,12 +195,37 @@ const ProfilePage = () => {
         <div className="profile-card hero-card">
           <div className="profile-cover"></div>
           <div className="profile-info-main">
-            <div className="profile-avatar-large">
-               {profile?.photo ? (
-                 <img src={profile.photo} alt={formData.name} className="avatar-img" />
-               ) : (
-                 formData.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'DR'
-               )}
+            <div className="avatar-preview-container">
+                <div className="profile-avatar-large" onClick={() => !selectedFile && fileInputRef.current.click()}>
+                   {previewUrl || profile?.photo ? (
+                     <img src={previewUrl || profile.photo} alt={formData.name} className="avatar-img" />
+                   ) : (
+                     formData.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'DR'
+                   )}
+                   {!selectedFile && (
+                       <div className="avatar-overlay">
+                         {uploading ? <Loader className="spinner" size={24} /> : <Camera size={24} />}
+                       </div>
+                   )}
+                   <input 
+                     type="file" 
+                     ref={fileInputRef} 
+                     onChange={handleFileChange} 
+                     accept="image/*" 
+                     style={{ display: 'none' }} 
+                   />
+                </div>
+                {selectedFile && (
+                    <div className="preview-actions">
+                        <button type="button" className="confirm-upload-btn" onClick={handleUpload} disabled={uploading}>
+                            {uploading ? <Loader className="spinner" size={16} /> : <Save size={16} />}
+                            <span>Upload</span>
+                        </button>
+                        <button type="button" className="cancel-upload-btn" onClick={cancelUpload} disabled={uploading}>
+                            <X size={16} />
+                        </button>
+                    </div>
+                )}
             </div>
             <div className="profile-name-section">
               {isEditing ? (

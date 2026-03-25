@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
 
-import { 
-  Activity, LayoutDashboard, Calendar, 
-  Settings, Moon, Sun, User, Users 
+import {
+  Activity, LayoutDashboard, Calendar,
+  Settings, Moon, Sun, User, Users
 } from 'lucide-react';
 
 
@@ -50,56 +50,56 @@ const PatientPortalLayout = () => {
     try {
       const token = sessionStorage.getItem('token');
       if (!token) return;
-      
+
       const res = await fetch('/api/patients/appointments', {
-         headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
-         const data = await res.json();
-         // Backend returns appointment arrays
-         const scheduled = data.filter(a => a.status === 'BOOKED' || a.status === 'PENDING').map(a => ({
-             id: a.id,
-             doctor: a.doctor ? a.doctor.name : 'Unknown',
-             specialty: a.doctor ? a.doctor.specialty : 'Consultation',
-             date: a.slot ? new Date(a.slot.startTime).toLocaleDateString() : 'N/A',
-             time: a.slot ? new Date(a.slot.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'N/A',
-             type: 'Consultation',
-             status: 'scheduled',
-             slotId: a.slotId,
-             startTime: a.slot ? a.slot.startTime : null,
-             doctorId: a.doctorId
-         }));
+        const data = await res.json();
+        // Backend returns appointment arrays
+        const scheduled = data.filter(a => a.status === 'BOOKED' || a.status === 'PENDING').map(a => ({
+          id: a.id,
+          doctor: a.doctor ? a.doctor.name : 'Unknown',
+          specialty: a.doctor ? a.doctor.specialty : 'Consultation',
+          date: a.slot ? new Date(a.slot.startTime).toLocaleDateString() : 'N/A',
+          time: a.slot ? new Date(a.slot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A',
+          type: 'Consultation',
+          status: 'scheduled',
+          slotId: a.slotId,
+          startTime: a.slot ? a.slot.startTime : null,
+          doctorId: a.doctorId
+        }));
 
-         const completed = data.filter(a => a.status === 'COMPLETED').map(a => ({
-             id: a.id,
-             doctor: a.doctor ? a.doctor.name : 'Unknown',
-             specialty: a.doctor ? a.doctor.specialty : 'Consultation',
-             date: a.slot ? new Date(a.slot.startTime).toLocaleDateString() : 'N/A',
-             time: a.slot ? new Date(a.slot.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'N/A',
-             type: 'Consultation',
-             status: 'completed',
-             slotId: a.slotId,
-             startTime: a.slot ? a.slot.startTime : null,
-             doctorId: a.doctorId
-          }));
+        const completed = data.filter(a => a.status === 'COMPLETED').map(a => ({
+          id: a.id,
+          doctor: a.doctor ? a.doctor.name : 'Unknown',
+          specialty: a.doctor ? a.doctor.specialty : 'Consultation',
+          date: a.slot ? new Date(a.slot.startTime).toLocaleDateString() : 'N/A',
+          time: a.slot ? new Date(a.slot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A',
+          type: 'Consultation',
+          status: 'completed',
+          slotId: a.slotId,
+          startTime: a.slot ? a.slot.startTime : null,
+          doctorId: a.doctorId
+        }));
 
-         const cancelled = data.filter(a => a.status === 'CANCELLED').map(a => ({
-             id: a.id,
-             doctor: a.doctor ? a.doctor.name : 'Unknown',
-             specialty: a.doctor ? a.doctor.specialty : 'Consultation',
-             date: a.slot ? new Date(a.slot.startTime).toLocaleDateString() : 'N/A',
-             time: a.slot ? new Date(a.slot.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'N/A',
-             type: 'Consultation',
-             status: 'cancelled',
-             slotId: a.slotId,
-             startTime: a.slot ? a.slot.startTime : null,
-             doctorId: a.doctorId
-          }));
+        const cancelled = data.filter(a => a.status === 'CANCELLED').map(a => ({
+          id: a.id,
+          doctor: a.doctor ? a.doctor.name : 'Unknown',
+          specialty: a.doctor ? a.doctor.specialty : 'Consultation',
+          date: a.slot ? new Date(a.slot.startTime).toLocaleDateString() : 'N/A',
+          time: a.slot ? new Date(a.slot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A',
+          type: 'Consultation',
+          status: 'cancelled',
+          slotId: a.slotId,
+          startTime: a.slot ? a.slot.startTime : null,
+          doctorId: a.doctorId
+        }));
 
-         setAppointments({ scheduled, cancelled, completed });
+        setAppointments({ scheduled, cancelled, completed });
       }
     } catch (err) {
-       console.error("Error fetching appointments:", err);
+      console.error("Error fetching appointments:", err);
     }
   };
 
@@ -122,20 +122,20 @@ const PatientPortalLayout = () => {
         </div>
 
         <nav className="sidebar-nav">
-          <NavLink to="/patient" end className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
+          <NavLink to="/patient" end className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
             <LayoutDashboard size={20} />
             <span>Dashboard</span>
           </NavLink>
-          <NavLink to="/patient/appointments" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
+          <NavLink to="/patient/appointments" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
             <Calendar size={20} />
             <span>Appointments</span>
           </NavLink>
-          <NavLink to="/patient/doctors" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
+          <NavLink to="/patient/doctors" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
             <Users size={20} />
             <span>Doctors</span>
           </NavLink>
 
-          <NavLink to="/patient/profile" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
+          <NavLink to="/patient/profile" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
 
             <User size={20} />
             <span>Profile</span>
@@ -148,7 +148,7 @@ const PatientPortalLayout = () => {
             <div className="avatar nav-avatar">{userInitials}</div>
             <span className="user-name">{userName}</span>
           </div>
-          <button className="cookie-btn-sidebar">Manage cookies or opt out</button>
+
         </div>
       </aside>
 

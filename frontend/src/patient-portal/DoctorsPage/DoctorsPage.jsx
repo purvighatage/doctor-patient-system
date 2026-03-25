@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, User, Star, Clock, MapPin, Calendar, Filter, ChevronDown, X } from 'lucide-react';
+import Skeleton from '../../components/Skeleton/Skeleton';
 import './DoctorsPage.css';
 
 /**
@@ -17,7 +18,7 @@ const DoctorsPage = () => {
     const navigate = useNavigate();
     const [doctors, setDoctors] = useState([]);
     const [loading, setLoading] = useState(true);
-    
+
     // Filters State
     const [searchTerm, setSearchTerm] = useState('');
     const [specialtyFilter, setSpecialtyFilter] = useState('All');
@@ -70,7 +71,11 @@ const DoctorsPage = () => {
             const uniqueMap = { 'All': true };
             doctors.forEach(d => {
                 if (d.specialty) {
-                    const canonical = d.specialty.trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+                    // Normalize to Title Case to prevent duplicates like "cardiology" and "Cardiology"
+                    const canonical = d.specialty.trim().toLowerCase()
+                                        .split(' ')
+                                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                                        .join(' ');
                     uniqueMap[canonical] = true;
                 }
             });
@@ -103,9 +108,9 @@ const DoctorsPage = () => {
                 <div className="main-search-row">
                     <div className="search-box">
                         <Search size={20} className="icon" />
-                        <input 
-                            type="text" 
-                            placeholder="Search by name or keyword..." 
+                        <input
+                            type="text"
+                            placeholder="Search by name or keyword..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -135,27 +140,27 @@ const DoctorsPage = () => {
                         </div>
                         <div className="adv-field">
                             <label>Preferred Date</label>
-                            <input 
-                                type="date" 
-                                value={dateFilter} 
+                            <input
+                                type="date"
+                                value={dateFilter}
                                 min={new Date().toISOString().split('T')[0]}
-                                onChange={(e) => setDateFilter(e.target.value)} 
+                                onChange={(e) => setDateFilter(e.target.value)}
                             />
                         </div>
                         <div className="adv-field">
                             <label>Preferred Time</label>
-                            <input 
-                                type="time" 
-                                value={timeFilter} 
-                                onChange={(e) => setTimeFilter(e.target.value)} 
+                            <input
+                                type="time"
+                                value={timeFilter}
+                                onChange={(e) => setTimeFilter(e.target.value)}
                             />
                         </div>
                         <div className="adv-field">
                             <label>Fee Range (₹)</label>
                             <div className="range-inputs">
-                                <input type="number" placeholder="Min" value={feeRange.min} onChange={(e) => setFeeRange({...feeRange, min: e.target.value})} />
+                                <input type="number" placeholder="Min" value={feeRange.min} onChange={(e) => setFeeRange({ ...feeRange, min: e.target.value })} />
                                 <span>-</span>
-                                <input type="number" placeholder="Max" value={feeRange.max} onChange={(e) => setFeeRange({...feeRange, max: e.target.value})} />
+                                <input type="number" placeholder="Max" value={feeRange.max} onChange={(e) => setFeeRange({ ...feeRange, max: e.target.value })} />
                             </div>
                         </div>
                         <button className="clear-btn" onClick={clearFilters}>
@@ -165,11 +170,9 @@ const DoctorsPage = () => {
                     </div>
                 )}
             </div>
-
             {loading ? (
-                <div className="loading-state">
-                    <div className="spinner"></div>
-                    <p>Matching you with the best doctors...</p>
+                <div className="doctors-grid">
+                    <Skeleton type="doctor-card" count={6} />
                 </div>
             ) : (
                 <div className="doctors-grid">
@@ -178,7 +181,7 @@ const DoctorsPage = () => {
                             <div key={doctor.id} className="doctor-card" onClick={() => navigate(`/patient/doctors/${doctor.id}`)}>
                                 <div className="card-top">
                                     <div className="doctor-avatar">
-                                        {doctor.photo ? <img src={doctor.photo} alt={doctor.name} /> : <User size={40} />}
+                                        <img src={doctor.photo || "/uploads/default-doctor.png"} alt={doctor.name} />
                                     </div>
                                     <div className="doctor-rating">
                                         <Star size={14} fill="#FFD700" color="#FFD700" />
@@ -187,8 +190,11 @@ const DoctorsPage = () => {
                                 </div>
                                 <div className="card-content">
                                     <h3 className="doctor-name">Dr. {doctor.name}</h3>
-                                    <p className="doctor-specialty">{doctor.specialty}</p>
-                                    
+                                    <div className="specialty-row">
+                                        <p className="doctor-specialty">{doctor.specialty}</p>
+                                        {doctor.qualifications && <span className="doc-qual">({doctor.qualifications})</span>}
+                                    </div>
+
                                     <div className="doctor-meta">
                                         <div className="meta-item">
                                             <Clock size={16} />
@@ -202,10 +208,10 @@ const DoctorsPage = () => {
 
                                     <div className="price-tag">
                                         <span className="label">Consultation Fee</span>
-                                        <span className="value">₹{doctor.fees || 500}</span>
+                                        <span className="value">₹{doctor.fees ?? 500}</span>
                                     </div>
 
-                                    <button 
+                                    <button
                                         className="doctor-card-book-btn"
                                         onClick={(e) => {
                                             e.stopPropagation();

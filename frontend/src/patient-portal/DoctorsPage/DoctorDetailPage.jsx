@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, Star, Clock, MapPin, Calendar, Heart, Share2, Award, Briefcase, DollarSign } from 'lucide-react';
+import Skeleton from '../../components/Skeleton/Skeleton';
 import './DoctorDetailPage.css';
 
 /**
@@ -18,6 +19,9 @@ const DoctorDetailPage = () => {
     const navigate = useNavigate();
     const [doctor, setDoctor] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [selectedSlotId, setSelectedSlotId] = useState(null);
+    const [booking, setBooking] = useState(false);
+    const [bookingSuccess, setBookingSuccess] = useState(false);
 
     useEffect(() => {
         const fetchDoctor = async () => {
@@ -39,19 +43,45 @@ const DoctorDetailPage = () => {
         fetchDoctor();
     }, [id]);
 
-    /**
-     * Navigates the user to the booking flow for this specific doctor.
-     * Passes the doctorId as a query parameter to pre-configure the booking modal.
-     */
-    const handleBookAppointment = () => {
-        navigate(`/patient/appointments?book=true&doctorId=${id}`);
+    const handleConfirmBooking = async () => {
+        if (!selectedSlotId) return;
+        setBooking(true);
+        try {
+            const token = sessionStorage.getItem('token');
+            const response = await fetch('/api/patients/appointments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ slotId: selectedSlotId })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setBookingSuccess(true);
+                alert("Appointment booked successfully!");
+                // Refresh doctor data to show slot as booked/removed
+                const res = await fetch(`/api/patients/doctors/${id}`);
+                const updatedDoctor = await res.json();
+                setDoctor(updatedDoctor);
+                setSelectedSlotId(null);
+            } else {
+                alert(data.message || "Booking failed");
+            }
+        } catch (error) {
+            console.error("Error booking appointment:", error);
+            alert("An error occurred during booking.");
+        } finally {
+            setBooking(false);
+        }
     };
+
+    const nextAvailableSlot = doctor?.slots?.length > 0 ? doctor.slots[0] : null;
 
     if (loading) {
         return (
-            <div className="detail-loading">
-                <div className="spinner"></div>
-                <p>Loading doctor profile...</p>
+            <div className="doctor-detail-container">
+                <Skeleton type="doctor-detail" />
             </div>
         );
     }
@@ -154,16 +184,41 @@ const DoctorDetailPage = () => {
                     <div className="booking-sticky-card">
                         <div className="price-header">
                              <span className="p-label">Consultation Fee</span>
-                             <span className="p-value">₹{doctor.fees || 500}</span>
+                             <span className="p-value">₹{doctor.fees ?? 500}</span>
                         </div>
                         
                         <div className="next-available">
                             <Clock size={16} />
-                            <span>Next availability: Tomorrow, 10:00 AM</span>
+                            <span>
+                                {nextAvailableSlot 
+                                    ? `Next availability: ${new Date(nextAvailableSlot.date).toLocaleDateString()} at ${new Date(nextAvailableSlot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                                    : 'No slots currently available'}
+                            </span>
                         </div>
 
-                        <button className="book-now-full-btn" onClick={handleBookAppointment}>
-                            Book Appointment Now
+                        {doctor.slots?.length > 0 && (
+                            <div className="slot-picker-container">
+                                <h4>Select a Time Slot</h4>
+                                <div className="slot-grid-mini">
+                                    {doctor.slots.map(slot => (
+                                        <button 
+                                            key={slot.id}
+                                            className={`slot-chip-mini ${selectedSlotId === slot.id ? 'active' : ''}`}
+                                            onClick={() => setSelectedSlotId(slot.id)}
+                                        >
+                                            {new Date(slot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        <button 
+                            className="book-now-full-btn" 
+                            disabled={!selectedSlotId || booking}
+                            onClick={handleConfirmBooking}
+                        >
+                            {booking ? 'Processing...' : (selectedSlotId ? 'Confirm Booking' : 'Select a Slot to Book')}
                         </button>
 
                         <ul className="booking-perks">

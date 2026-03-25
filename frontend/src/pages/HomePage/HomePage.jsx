@@ -3,16 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Activity, Moon, Sun, ArrowRight, Calendar, Video, Shield, Users, Star, CheckCircle, Search } from 'lucide-react';
 import './HomePage.css';
 
-/**
- * HomePage Component
- * 
- * The main landing page of the MediCare application. 
- * Features a comprehensive overview of the platform, including:
- * - Hero section with integrated doctor search
- * - Key feature highlights (Easy Booking, Video Calls, etc.)
- * - Statistics and social proof
- * - Testimonials and call-to-action sections
- */
+
 const HomePage = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,10 +17,7 @@ const HomePage = () => {
     }
   }, [isDarkMode]);
 
-  /**
-   * Toggles the theme between light and dark mode.
-   * Updates the 'isDarkMode' state which in turn triggers the body class effect.
-   */
+
   const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
   return (
     <>
@@ -315,8 +303,8 @@ const HomePage = () => {
         </div>
       </footer>
 
-      {/* Cookie Consent Button */}
-      <button className="cookie-btn">Manage cookies or opt out</button>
+
+
     </>
   );
 };

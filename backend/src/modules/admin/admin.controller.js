@@ -15,7 +15,7 @@ const createDoctor = async (req, res) => {
 
     // Validate numeric fields are non-negative
     const exp = parseInt(experience) || 0;
-    const fee = parseFloat(fees) || 0;
+    const fee = parseFloat(fees) || 500;
     
     if (exp < 0 || fee < 0) {
       return res.status(400).json({ message: "Experience and fees cannot be negative" });
@@ -44,7 +44,7 @@ const createDoctor = async (req, res) => {
             specialty,
             qualifications,
             experience: parseInt(experience) || 0,
-            fees: parseFloat(fees) || 0,
+            fees: parseFloat(fees) || 500,
             clinic,
             gender,
             photo,

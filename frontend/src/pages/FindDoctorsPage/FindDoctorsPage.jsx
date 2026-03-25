@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Search, MapPin, Star, Clock, Activity, ArrowLeft, ChevronDown, Filter, X, Calendar } from 'lucide-react';
+import Skeleton from '../../components/Skeleton/Skeleton';
 import './FindDoctorsPage.css';
 
 /**
@@ -97,7 +98,10 @@ const FindDoctorsPage = () => {
   const specialtiesMap = {};
   doctors.forEach(d => {
     if (d.specialty) {
-      const canonical = d.specialty.trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+      const canonical = d.specialty.trim().toLowerCase()
+                                    .split(' ')
+                                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                                    .join(' ');
       specialtiesMap[canonical] = true;
     }
   });
@@ -197,9 +201,8 @@ const FindDoctorsPage = () => {
         </div>
 
         {loading ? (
-          <div className="loading-state">
-            <div className="spinner"></div>
-            <p>Finding the right doctors for you...</p>
+          <div className="doctors-grid">
+            <Skeleton type="doctor-card" count={6} />
           </div>
         ) : (
           <div className="doctors-grid">
@@ -208,11 +211,14 @@ const FindDoctorsPage = () => {
                 <div key={doctor.id} className="doctor-card-find" onClick={() => navigate(`/doctors/${doctor.id}`)}>
                   <div className="card-header-find">
                     <div className="avatar-find">
-                      {doctor.photo ? <img src={doctor.photo} alt={doctor.name} /> : <span>{doctor.name.charAt(0)}</span>}
+                      <img src={doctor.photo || "/uploads/default-doctor.png"} alt={doctor.name} />
                     </div>
                     <div className="basic-info-find">
                       <h3>Dr. {doctor.name}</h3>
-                      <span className="spec-badge">{doctor.specialty}</span>
+                      <div className="spec-row-find">
+                        <span className="spec-badge">{doctor.specialty}</span>
+                        {doctor.qualifications && <span className="qual-text-find">({doctor.qualifications})</span>}
+                      </div>
                     </div>
                   </div>
                   
@@ -236,7 +242,7 @@ const FindDoctorsPage = () => {
                   <div className="card-footer-find">
                     <div className="fee-info">
                       <span className="f-label">Fee</span>
-                      <span className="f-amount">₹{doctor.fees || 500}</span>
+                      <span className="f-amount">₹{doctor.fees ?? 500}</span>
                     </div>
                     <button onClick={(e) => handleBookNow(doctor.id, e)} className="book-btn-find">
                       <Calendar size={16} />

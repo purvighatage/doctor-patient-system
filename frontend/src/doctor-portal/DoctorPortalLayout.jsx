@@ -17,7 +17,8 @@ const DoctorPortalLayout = () => {
       const docName = user.name.startsWith('Dr.') ? user.name : `Dr. ${user.name}`;
       setDoctor({
          name: docName,
-         role: user.specialty || "Specialist"
+         role: user.specialty || "Specialist",
+         photo: user.doctor?.photo || ""
       });
       const initials = docName.replace('Dr. ', '').split(' ').map(n => n[0]).join('').toUpperCase();
       setUserInitials(initials);
@@ -82,7 +83,7 @@ const DoctorPortalLayout = () => {
         <div className="sidebar-footer">
           <div className="user-profile" onClick={() => navigate('/doctor/profile')} style={{ cursor: 'pointer' }}>
             <div className="avatar">
-               {doctor.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+               {doctor.photo ? <img src={doctor.photo} alt="" style={{width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit'}} /> : userInitials}
             </div>
             <div className="user-info">
               <h4>{doctor.name}</h4>
@@ -103,7 +104,7 @@ const DoctorPortalLayout = () => {
             </button>
             <div className="avatar-wrapper">
               <div className="avatar topbar-avatar" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
-                {userInitials}
+                {doctor.photo ? <img src={doctor.photo} alt="" style={{width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit'}} /> : userInitials}
               </div>
               {isDropdownOpen && (
                 <div className="avatar-dropdown">

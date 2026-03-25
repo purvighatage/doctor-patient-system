@@ -100,6 +100,7 @@
     color: #009ca6;
     font-weight: 600;
     margin: 4px 0 12px;
+    text-transform: capitalize;
 }
 
 .rating-row {
@@ -276,21 +277,79 @@
 .book-now-full-btn {
     width: 100%;
     padding: 16px;
-    background: #009ca6;
+    background: #fb6f92;
     color: white;
     border: none;
     border-radius: 12px;
     font-size: 16px;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 8px 16px rgba(0, 156, 166, 0.2);
-    transition: all 0.2s;
+    box-shadow: 0 8px 16px rgba(251, 111, 146, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     margin-bottom: 24px;
 }
 
-.book-now-full-btn:hover {
+.book-now-full-btn:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 12px 20px rgba(0, 156, 166, 0.3);
+    box-shadow: 0 12px 24px rgba(251, 111, 146, 0.35);
+    background: #f84b7a;
+}
+
+.book-now-full-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.book-now-full-btn:disabled {
+    background: #fbc2d0;
+    cursor: not-allowed;
+    box-shadow: none;
+    opacity: 0.7;
+}
+
+/* Slot Picker Styles */
+.slot-picker-container {
+    margin: 24px 0;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.slot-picker-container h4 {
+    font-size: 14px;
+    color: #1a1a1a;
+    margin-bottom: 12px;
+    font-weight: 700;
+}
+
+.slot-grid-mini {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.slot-chip-mini {
+    padding: 10px 4px;
+    background: #ffffff;
+    border: 1.5px solid #f1f5f9;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slot-chip-mini:hover {
+    border-color: #fb6f92;
+    background: #fff0f3;
+    color: #fb6f92;
+    transform: scale(1.02);
+}
+
+.slot-chip-mini.active {
+    background: #fb6f92;
+    color: white;
+    border-color: #fb6f92;
+    box-shadow: 0 4px 12px rgba(251, 111, 146, 0.25);
 }
 
 .booking-perks {

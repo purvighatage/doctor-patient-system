@@ -181,7 +181,7 @@ function DoctorsPage() {
                     <td>
                       <div className="doctor-info">
                         <div className="doc-avatar">
-                          {doc.photo ? <img src={doc.photo} alt={doc.name} /> : <UserRound size={18} />}
+                          <img src={doc.photo || "/uploads/default-doctor.png"} alt={doc.name} />
                         </div>
                         <div>
                           <div className="doc-name">{doc.name}</div>

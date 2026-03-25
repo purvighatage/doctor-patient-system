@@ -18,7 +18,7 @@ const RegisterPage = () => {
   const [role, setRole] = useState('PATIENT'); // 'PATIENT' or 'ADMIN'
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -29,7 +29,7 @@ const RegisterPage = () => {
     password: '',
     confirmPassword: ''
   });
-  
+
   const [passwordRequirements, setPasswordRequirements] = useState({
     length: false,
     uppercase: false,
@@ -57,10 +57,7 @@ const RegisterPage = () => {
     // If the dark mode state is kept globally via body class, nothing needed here
   }, []);
 
-  /**
-   * Updates state for form inputs and triggers password validation.
-   * @param {Object} e - Input change event.
-   */
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -72,17 +69,11 @@ const RegisterPage = () => {
     }
   };
 
-  /**
-   * Submits the registration form.
-   * - Validates password confirmation and requirements.
-   * - Constructs the appropriate payload based on user role.
-   * - Calls the registration API and redirects upon success.
-   * @param {Object} e - Form submission event.
-   */
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    
+
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords don't match!");
       return;
@@ -116,7 +107,7 @@ const RegisterPage = () => {
         };
         await registerAdmin(payload);
       }
-      
+
       alert('Registration successful! Please log in.');
       navigate('/login');
     } catch (err) {
@@ -282,7 +273,7 @@ const RegisterPage = () => {
               onChange={handleChange}
               required
             />
-            
+
             <div className="password-requirements">
               <span className="password-requirements-title">Password must contain:</span>
               <div className={`requirement-item ${passwordRequirements.length ? 'met' : ''}`}>

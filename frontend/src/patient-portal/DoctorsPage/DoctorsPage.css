@@ -167,14 +167,22 @@
     background: white;
     border-radius: 20px;
     overflow: hidden;
-    transition: all 0.3s;
-    border: 1px solid #f0f0f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
+    border: 1px solid #f1f5f9;
+    animation: cardFadeIn 0.5s ease-out forwards;
+}
+
+@keyframes cardFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .doctor-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: #fb6f92;
 }
 
 .card-top {
@@ -215,7 +223,9 @@
 }
 
 .doctor-name { font-size: 20px; margin: 0; color: #1a1a1a; }
-.doctor-specialty { color: #009ca6; font-weight: 600; margin: 4px 0 16px; font-size: 14px; }
+.specialty-row { display: flex; align-items: center; gap: 8px; margin: 4px 0 16px; flex-wrap: wrap; }
+.doctor-specialty { color: #009ca6; font-weight: 600; font-size: 14px; margin: 0; text-transform: capitalize; }
+.doc-qual { color: #757575; font-size: 12px; font-weight: 500; font-style: italic; }
 
 .doctor-meta { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
 .meta-item { display: flex; align-items: center; gap: 8px; color: #757575; font-size: 14px; }
