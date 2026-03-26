@@ -54,7 +54,7 @@ const ChangePasswordPage = () => {
         // Update user mustChangePassword flag locally
         const userStr = sessionStorage.getItem('user');
         if (userStr) {
-          const user = JSON.parse(userStr);
+          const user = JSON.parse(userStr);//convert user string to object
           user.mustChangePassword = false;
           sessionStorage.setItem('user', JSON.stringify(user));
         }

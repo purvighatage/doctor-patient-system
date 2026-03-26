@@ -49,7 +49,7 @@ function AnalyticsPage() {
   for (let i = 29; i >= 0; i--) {
       const d = new Date();
       d.setDate(today.getDate() - i);
-      const dateKey = d.toISOString().split('T')[0];
+      const dateKey = d.toISOString().split('T')[0];//convert to YYYY-MM-DD
       const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       const count = visuals?.appointmentsOverTime?.[dateKey] || 0;
       appointmentsOverTimeData.push({

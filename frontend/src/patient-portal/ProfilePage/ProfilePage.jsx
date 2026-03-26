@@ -26,7 +26,7 @@ const ProfilePage = () => {
   useEffect(() => {
     const userStr = sessionStorage.getItem('user');
     if (userStr) {
-      const user = JSON.parse(userStr);
+      const user = JSON.parse(userStr);//convert string back to object
       setProfileData(prev => ({
         ...prev,
         name: user.name || prev.name,
@@ -43,7 +43,7 @@ const ProfilePage = () => {
    * @param {Object} e - Input change event.
    */
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target;//destructure name and value from event target
     setProfileData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -59,7 +59,7 @@ const ProfilePage = () => {
     // In a real app, save to backend here
     sessionStorage.setItem('user', JSON.stringify({
       ...JSON.parse(sessionStorage.getItem('user') || '{}'),
-      ...profileData
+      ...profileData//
     }));
   };
 

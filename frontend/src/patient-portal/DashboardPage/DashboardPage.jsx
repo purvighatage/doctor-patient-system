@@ -8,17 +8,7 @@ import {
 
 import './DashboardPage.css';
 
-/**
- * DashboardPage Component
- * 
- * The initial landing view for authenticated patients.
- * Displays:
- * - A personalized welcome greeting.
- * - Key statistics (e.g., count of upcoming appointments).
- * - A summary list of the most immediate scheduled consultations.
- * - Health metrics tracking (Health Score, Heart Rate, Blood Pressure).
- * - Quick action entry points (e.g., Book Appointment).
- */
+
 const DashboardPage = () => {
   const [userName, setUserName] = React.useState('Patient');
   const { appointments } = useOutletContext();
@@ -27,7 +17,7 @@ const DashboardPage = () => {
   React.useEffect(() => {
     const userStr = sessionStorage.getItem('user');
     if (userStr) {
-      const user = JSON.parse(userStr);
+      const user = JSON.parse(userStr);//convert string back to object
       // Backend User might have .name, or just split email etc.
       if (user.name) setUserName(user.name);
     }

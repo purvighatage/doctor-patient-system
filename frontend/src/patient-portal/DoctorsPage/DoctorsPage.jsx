@@ -39,8 +39,8 @@ const DoctorsPage = () => {
     const fetchDoctors = async () => {
         setLoading(true);
         try {
-            const params = new URLSearchParams();
-            if (searchTerm) params.append('search', searchTerm);
+            const params = new URLSearchParams();//
+            if (searchTerm) params.append('search', searchTerm);//
             if (specialtyFilter !== 'All') params.append('specialty', specialtyFilter);
             if (genderFilter !== 'All') params.append('gender', genderFilter);
             if (feeRange.min) params.append('minFee', feeRange.min);
@@ -215,11 +215,11 @@ const DoctorsPage = () => {
                                         className="doctor-card-book-btn"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            navigate(`/patient/appointments?book=true&doctorId=${doctor.id}`);
+                                            navigate(`/patient/doctors/${doctor.id}`);
                                         }}
                                     >
                                         <Calendar size={18} />
-                                        <span>Book Now</span>
+                                        <span>View & Book</span>
                                     </button>
                                 </div>
                             </div>

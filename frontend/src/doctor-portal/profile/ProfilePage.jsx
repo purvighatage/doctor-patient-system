@@ -2,16 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { User, Mail, Award, Briefcase, DollarSign, MapPin, Building, Globe, Edit, Save, X, CheckCircle, Camera, Loader } from 'lucide-react';
 import './ProfilePage.css';
 
-/**
- * ProfilePage Component (Doctor Portal)
- * 
- * A comprehensive professional profile management system.
- * Features:
- * - Multi-section display of Personal, Professional, and Practice details.
- * - Editable fields for qualifications, experience, clinic address, and fees.
- * - Real-time synchronization with the backend and local session state (sessionStorage).
- * - Visual indicators for successful updates and error states.
- */
+
 const ProfilePage = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -100,7 +91,7 @@ const ProfilePage = () => {
         const data = await res.json();
         setProfile({ ...profile, photo: data.photoUrl });
         setFormData({ ...formData, photo: data.photoUrl });
-        
+
         // Update sessionStorage
         const userStr = sessionStorage.getItem('user');
         if (userStr) {
@@ -147,7 +138,7 @@ const ProfilePage = () => {
         setProfile(data.doctor);
         setIsEditing(false);
         setSuccessMsg('Profile updated successfully!');
-        
+
         // Update local session storage if name changed
         const userStr = sessionStorage.getItem('user');
         if (userStr) {
@@ -196,36 +187,36 @@ const ProfilePage = () => {
           <div className="profile-cover"></div>
           <div className="profile-info-main">
             <div className="avatar-preview-container">
-                <div className="profile-avatar-large" onClick={() => !selectedFile && fileInputRef.current.click()}>
-                   {previewUrl || profile?.photo ? (
-                     <img src={previewUrl || profile.photo} alt={formData.name} className="avatar-img" />
-                   ) : (
-                     formData.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'DR'
-                   )}
-                   {!selectedFile && (
-                       <div className="avatar-overlay">
-                         {uploading ? <Loader className="spinner" size={24} /> : <Camera size={24} />}
-                       </div>
-                   )}
-                   <input 
-                     type="file" 
-                     ref={fileInputRef} 
-                     onChange={handleFileChange} 
-                     accept="image/*" 
-                     style={{ display: 'none' }} 
-                   />
-                </div>
-                {selectedFile && (
-                    <div className="preview-actions">
-                        <button type="button" className="confirm-upload-btn" onClick={handleUpload} disabled={uploading}>
-                            {uploading ? <Loader className="spinner" size={16} /> : <Save size={16} />}
-                            <span>Upload</span>
-                        </button>
-                        <button type="button" className="cancel-upload-btn" onClick={cancelUpload} disabled={uploading}>
-                            <X size={16} />
-                        </button>
-                    </div>
+              <div className="profile-avatar-large" onClick={() => !selectedFile && fileInputRef.current.click()}>
+                {previewUrl || profile?.photo ? (
+                  <img src={previewUrl || profile.photo} alt={formData.name} className="avatar-img" />
+                ) : (
+                  formData.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'DR'
                 )}
+                {!selectedFile && (
+                  <div className="avatar-overlay">
+                    {uploading ? <Loader className="spinner" size={24} /> : <Camera size={24} />}
+                  </div>
+                )}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                />
+              </div>
+              {selectedFile && (
+                <div className="preview-actions">
+                  <button type="button" className="confirm-upload-btn" onClick={handleUpload} disabled={uploading}>
+                    {uploading ? <Loader className="spinner" size={16} /> : <Save size={16} />}
+                    <span>Upload</span>
+                  </button>
+                  <button type="button" className="cancel-upload-btn" onClick={cancelUpload} disabled={uploading}>
+                    <X size={16} />
+                  </button>
+                </div>
+              )}
             </div>
             <div className="profile-name-section">
               {isEditing ? (

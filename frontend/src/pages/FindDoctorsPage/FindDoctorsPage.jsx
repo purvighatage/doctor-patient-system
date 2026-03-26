@@ -89,9 +89,9 @@ const FindDoctorsPage = () => {
     const token = sessionStorage.getItem('token');
 
     if (!userStr || !token) {
-      navigate('/login');
+      navigate(`/doctors/${doctorId}`);
     } else {
-      navigate(`/patient/appointments?doctorId=${doctorId}&book=true`);
+      navigate(`/patient/doctors/${doctorId}`);
     }
   };
 

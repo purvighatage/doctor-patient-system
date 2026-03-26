@@ -38,7 +38,7 @@ const AdminAppointmentsPage = () => {
   const filteredAppointments = appointments.filter(app => {
     const searchLow = searchTerm.toLowerCase();
     const patientName = app.patient?.name?.toLowerCase() || '';
-    const doctorName = app.doctor?.name?.toLowerCase() || '';
+    const doctorName = app.doctor?.name?.toLowerCase() || '';//optional chaining to handle missing doctor info
     return patientName.includes(searchLow) || doctorName.includes(searchLow);
   });
 

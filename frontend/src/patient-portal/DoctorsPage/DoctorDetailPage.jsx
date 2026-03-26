@@ -44,10 +44,17 @@ const DoctorDetailPage = () => {
     }, [id]);
 
     const handleConfirmBooking = async () => {
+        const token = sessionStorage.getItem('token');
+        const userStr = sessionStorage.getItem('user');
+
+        if (!token || !userStr) {
+            navigate('/login');
+            return;
+        }
+
         if (!selectedSlotId) return;
         setBooking(true);
         try {
-            const token = sessionStorage.getItem('token');
             const response = await fetch('/api/patients/appointments', {
                 method: 'POST',
                 headers: {
